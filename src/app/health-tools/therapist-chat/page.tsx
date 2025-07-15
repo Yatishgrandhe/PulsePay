@@ -14,7 +14,6 @@ import {
   CircularProgress,
   Card,
   CardContent,
-  Grid
 } from "@mui/material";
 import { 
   Send, 
@@ -382,8 +381,8 @@ export default function TherapistChatPage() {
 
       {/* Features and Safety */}
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+          <Box sx={{ width: { xs: '100%', md: '33.333%' }, mb: 3 }}>
             <Card sx={{ borderRadius: 3, height: "100%" }}>
               <CardContent sx={{ textAlign: "center", p: 3 }}>
                 <Security sx={{ fontSize: 40, color: "#7B61FF", mb: 2 }} />
@@ -395,8 +394,8 @@ export default function TherapistChatPage() {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
+          </Box>
+          <Box sx={{ width: { xs: '100%', md: '33.333%' }, mb: 3 }}>
             <Card sx={{ borderRadius: 3, height: "100%" }}>
               <CardContent sx={{ textAlign: "center", p: 3 }}>
                 <Psychology sx={{ fontSize: 40, color: "#E573B7", mb: 2 }} />
@@ -408,8 +407,8 @@ export default function TherapistChatPage() {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
+          </Box>
+          <Box sx={{ width: { xs: '100%', md: '33.333%' }, mb: 3 }}>
             <Card sx={{ borderRadius: 3, height: "100%" }}>
               <CardContent sx={{ textAlign: "center", p: 3 }}>
                 <Warning sx={{ fontSize: 40, color: "#FF9800", mb: 2 }} />
@@ -421,8 +420,8 @@ export default function TherapistChatPage() {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
     </Box>
   );

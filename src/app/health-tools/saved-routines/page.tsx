@@ -11,7 +11,6 @@ import {
   Card,
   CardContent,
   Chip,
-  Grid,
   LinearProgress,
   Dialog,
   DialogTitle,
@@ -241,9 +240,9 @@ export default function SavedRoutinesPage() {
         </motion.div>
 
         {/* Routines Grid */}
-        <Grid container spacing={3}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
           {routines.map((routine, index) => (
-            <Grid item xs={12} md={6} lg={4} key={routine.id}>
+            <Box key={routine.id} sx={{ width: { xs: '100%', md: '50%', lg: '33.333%' }, mb: 3 }}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -447,9 +446,9 @@ export default function SavedRoutinesPage() {
                   </CardContent>
                 </Card>
               </motion.div>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {/* Empty State */}
         {routines.length === 0 && (
@@ -535,8 +534,8 @@ export default function SavedRoutinesPage() {
               </Box>
             </DialogTitle>
             <DialogContent>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+              <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3 }}>
+                <Box sx={{ flex: 1 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                     Plan Details
                   </Typography>
@@ -569,8 +568,8 @@ export default function SavedRoutinesPage() {
                       />
                     </ListItem>
                   </List>
-                </Grid>
-                <Grid item xs={12} md={6}>
+                </Box>
+                <Box sx={{ flex: 1 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                     Goals
                   </Typography>
@@ -587,8 +586,8 @@ export default function SavedRoutinesPage() {
                       />
                     ))}
                   </Box>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </DialogContent>
             <DialogActions sx={{ p: 3 }}>
               <Button

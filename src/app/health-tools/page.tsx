@@ -4,13 +4,12 @@ import {
   Box, 
   Container, 
   Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
+  Paper, 
   Button, 
-  Chip,
-  Paper,
-  IconButton
+  IconButton,
+  Card,
+  CardContent,
+  Chip
 } from "@mui/material";
 import { 
   Psychology, 
@@ -208,9 +207,9 @@ export default function HealthToolsPage() {
           </Typography>
         </motion.div>
 
-        <Grid container spacing={4}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {healthTools.map((tool, index) => (
-            <Grid item xs={12} md={4} key={tool.id}>
+            <Box key={tool.id} sx={{ width: { xs: '100%', md: '33.333%' }, mb: 4 }}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -321,9 +320,9 @@ export default function HealthToolsPage() {
                   </CardContent>
                 </Card>
               </motion.div>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
 
       {/* Coming Soon Section */}
@@ -354,9 +353,9 @@ export default function HealthToolsPage() {
             </Typography>
           </motion.div>
 
-          <Grid container spacing={4}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
             {comingSoonTools.map((tool, index) => (
-              <Grid item xs={12} md={4} key={tool.id}>
+              <Box key={tool.id} sx={{ width: { xs: '100%', md: '33.333%' }, mb: 4 }}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -422,9 +421,9 @@ export default function HealthToolsPage() {
                     />
                   </Paper>
                 </motion.div>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Container>
       </Box>
 

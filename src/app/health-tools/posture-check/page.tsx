@@ -11,7 +11,6 @@ import {
   Chip,
   Alert,
   CircularProgress,
-  Grid
 } from "@mui/material";
 import { 
   CameraAlt, 
@@ -233,9 +232,9 @@ export default function PostureCheckPage() {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Grid container spacing={4}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {/* Camera Section */}
-          <Grid item xs={12} md={6}>
+          <Box sx={{ width: { xs: '100%', md: '50%' }, mb: 4 }}>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -416,10 +415,10 @@ export default function PostureCheckPage() {
                 </Box>
               </Paper>
             </motion.div>
-          </Grid>
+          </Box>
 
           {/* Analysis Results */}
-          <Grid item xs={12} md={6}>
+          <Box sx={{ width: { xs: '100%', md: '50%' }, mb: 4 }}>
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -576,8 +575,8 @@ export default function PostureCheckPage() {
                 </Paper>
               )}
             </motion.div>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
     </Box>
   );

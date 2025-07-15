@@ -13,7 +13,6 @@ import {
   Chip,
   Alert,
   CircularProgress,
-  Grid,
   FormControl,
   Stepper,
   Step,
@@ -71,7 +70,6 @@ const steps = [
 
 export default function FitnessPlannerPage() {
   const [activeStep, setActiveStep] = useState(0);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [dietaryPreference, setDietaryPreference] = useState<DietaryPreference>("vegetarian");
   const [fitnessGoals, setFitnessGoals] = useState<string[]>([]);
 
@@ -82,8 +80,8 @@ export default function FitnessPlannerPage() {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setUploadedImage(e.target?.result as string);
+      reader.onload = () => {
+        // setUploadedImage(e.target?.result as string); // REMOVE THIS
         setActiveStep(1);
       };
       reader.readAsDataURL(file);
@@ -501,8 +499,8 @@ export default function FitnessPlannerPage() {
                       Review Your Plan
                     </Typography>
                     
-                    <Grid container spacing={3} sx={{ mb: 4 }}>
-                      <Grid item xs={12} md={6}>
+                    <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3, mb: 4 }}>
+                      <Box sx={{ width: { xs: "100%", md: "50%" } }}>
                         <Card sx={{ borderRadius: 3, height: "100%" }}>
                           <CardContent>
                             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
@@ -519,8 +517,8 @@ export default function FitnessPlannerPage() {
                             />
                           </CardContent>
                         </Card>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
+                      </Box>
+                      <Box sx={{ width: { xs: "100%", md: "50%" } }}>
                         <Card sx={{ borderRadius: 3, height: "100%" }}>
                           <CardContent>
                             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
@@ -543,8 +541,8 @@ export default function FitnessPlannerPage() {
                             </Box>
                           </CardContent>
                         </Card>
-                      </Grid>
-                    </Grid>
+                      </Box>
+                    </Box>
 
                     <Alert severity="info" sx={{ borderRadius: 2, mb: 3 }}>
                       <Typography variant="body2">
@@ -656,8 +654,8 @@ export default function FitnessPlannerPage() {
                             </Box>
                           </CardContent>
                         </Card>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
+                      </Box>
+                      <Box sx={{ width: { xs: "100%", md: "50%" } }}>
                         <Card sx={{ borderRadius: 3, height: "100%" }}>
                           <CardContent>
                             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
@@ -690,8 +688,8 @@ export default function FitnessPlannerPage() {
                             </Box>
                           </CardContent>
                         </Card>
-                      </Grid>
-                    </Grid>
+                      </Box>
+                    </Box>
 
                     <Box sx={{ mt: 4, textAlign: "center" }}>
                       <Button
@@ -718,8 +716,8 @@ export default function FitnessPlannerPage() {
                 )}
               </Paper>
             </motion.div>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
     </Box>
   );

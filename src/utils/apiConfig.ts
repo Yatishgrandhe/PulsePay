@@ -38,7 +38,7 @@ export const API_CONFIG = {
 // API Helper Functions
 export const apiHelpers = {
   // Therapist Chat API
-  async sendChatMessage(message: string, conversationHistory: any[] = []) {
+  async sendChatMessage(message: string) {
     try {
       // Placeholder implementation - replace with actual OpenRouter API call
       console.log('Sending message to OpenRouter API:', message);
@@ -59,7 +59,7 @@ export const apiHelpers = {
   },
 
   // Posture Analysis API
-  async analyzePosture(imageData: string) {
+  async analyzePosture() {
     try {
       // Placeholder implementation - replace with actual Computer Vision API call
       console.log('Analyzing posture with Computer Vision API');
