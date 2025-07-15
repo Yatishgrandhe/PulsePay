@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { 
   Box, 
   Typography, 
@@ -28,6 +28,13 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
+// Type declaration for Web Speech API
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+  }
+}
+
 interface Message {
   id: string;
   text: string;
@@ -52,9 +59,77 @@ export default function TherapistChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [isVoiceChat, setIsVoiceChat] = useState(false);
+  const [transcript, setTranscript] = useState("");
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+      
+      recognitionRef.current.onresult = (event: any) => {
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          }
+        }
+        
+        if (finalTranscript) {
+          setTranscript(prev => prev + finalTranscript);
+        }
+      };
+      
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, [isVoiceChat]);
+
+  const handleVoiceMessage = useCallback((message: string) => {
+    if (!currentChat) return;
+    
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: message,
+      sender: "user",
+      timestamp: new Date()
+    };
+
+    // Update chat with user message
+    const updatedChat = {
+      ...currentChat,
+      messages: [...currentChat.messages, userMessage],
+      title: currentChat.messages.length === 0 ? message.slice(0, 30) + "..." : currentChat.title,
+      updatedAt: new Date()
+    };
+
+    setCurrentChat(updatedChat);
+    setChatSessions(prev => 
+      prev.map(chat => 
+        chat.id === updatedChat.id ? updatedChat : chat
+      )
+    );
+
+    // Generate AI response
+    generateResponse(message);
+  }, [currentChat]);
 
   // Load chats from localStorage on component mount
   useEffect(() => {
@@ -247,6 +322,30 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
     }
   };
 
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      alert('Speech recognition is not supported in your browser');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+      setTranscript("");
+    }
+  };
+
+  const toggleVoiceChat = () => {
+    setIsVoiceChat(!isVoiceChat);
+    if (isVoiceChat && isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    }
+  };
+
 
 
   return (
@@ -290,6 +389,23 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
               <ArrowBack />
             </IconButton>
           </Link>
+          <Button
+            variant="outlined"
+            startIcon={<Add />}
+            onClick={createNewChat}
+            sx={{
+              borderColor: "rgba(255, 255, 255, 0.3)",
+              color: "white",
+              "&:hover": {
+                borderColor: "white",
+                background: "rgba(255, 255, 255, 0.1)",
+              },
+              textTransform: "none",
+              fontWeight: 500
+            }}
+          >
+            New Chat
+          </Button>
         </Box>
       </Box>
 
@@ -405,38 +521,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
           ))}
         </Box>
 
-        {/* Bottom Section */}
-        <Box sx={{ p: 2, borderTop: "1px solid rgba(123, 97, 255, 0.2)" }}>
-          <Button
-            fullWidth
-            variant="text"
-            startIcon={<Add />}
-            sx={{
-              color: "#7B61FF",
-              "&:hover": {
-                background: "rgba(123, 97, 255, 0.1)",
-              },
-              textTransform: "none",
-              fontWeight: 500,
-              justifyContent: "flex-start",
-              fontSize: "14px"
-            }}
-          >
-            Upgrade plan
-          </Button>
-          <Typography 
-            variant="caption" 
-            sx={{ 
-              color: "#666", 
-              fontSize: "12px", 
-              display: "block", 
-              mt: 0.5, 
-              px: 1 
-            }}
-          >
-            More access to the best models
-          </Typography>
-        </Box>
+
       </Box>
 
       {/* Main Chat Area */}
@@ -612,36 +697,23 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 position: "relative"
               }}
             >
-              <Box sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                position: "absolute",
-                left: 12,
-                top: 12,
-                zIndex: 1
-              }}>
-                <Add sx={{ fontSize: 16, color: "#666" }} />
-                <Typography variant="body2" sx={{ color: "#666", fontSize: "14px" }}>
-                  Tools
-                </Typography>
-              </Box>
+
                               <TextField
                   ref={inputRef}
                   fullWidth
                   multiline
                   maxRows={4}
-                  value={inputText}
+                  value={isListening ? transcript : inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask anything"
+                  placeholder={isListening ? "Listening..." : "Ask anything"}
                   variant="outlined"
-                  disabled={loading}
+                  disabled={loading || isListening}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 3,
-                      background: "#ffffff",
-                      border: "1px solid #e5e5e5",
+                      background: isListening ? "#fff3e0" : "#ffffff",
+                      border: isListening ? "1px solid #ff9800" : "1px solid #e5e5e5",
                       pl: 8,
                       pr: 8,
                       "&:hover": {
@@ -656,7 +728,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                       "& .MuiInputBase-input": {
                         color: "#333",
                         "&::placeholder": {
-                          color: "#666",
+                          color: isListening ? "#ff9800" : "#666",
                           opacity: 1
                         }
                       }
@@ -672,21 +744,23 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 gap: 1
               }}>
                 <IconButton
+                  onClick={toggleVoiceInput}
                   size="small"
                   sx={{
-                    color: "#666",
+                    color: isListening ? "#f44336" : "#666",
                     p: 0.5,
                     "&:hover": {
-                      color: "#7B61FF",
+                      color: isListening ? "#f44336" : "#7B61FF",
                     },
                   }}
                 >
                   <Mic sx={{ fontSize: 16 }} />
                 </IconButton>
                 <IconButton
+                  onClick={toggleVoiceChat}
                   size="small"
                   sx={{
-                    color: "#666",
+                    color: isVoiceChat ? "#7B61FF" : "#666",
                     p: 0.5,
                     "&:hover": {
                       color: "#7B61FF",
@@ -696,11 +770,18 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                   <GraphicEq sx={{ fontSize: 16 }} />
                 </IconButton>
                 <IconButton
-                  onClick={handleSendMessage}
-                  disabled={!inputText.trim() || loading}
+                  onClick={isListening ? () => {
+                    if (transcript.trim()) {
+                      handleVoiceMessage(transcript);
+                      setTranscript("");
+                      recognitionRef.current?.stop();
+                      setIsListening(false);
+                    }
+                  } : handleSendMessage}
+                  disabled={(!inputText.trim() && !transcript.trim()) || loading}
                   size="small"
                   sx={{
-                    color: inputText.trim() ? "#7B61FF" : "#666",
+                    color: (inputText.trim() || transcript.trim()) ? "#7B61FF" : "#666",
                     p: 0.5,
                     "&:hover": {
                       color: "#7B61FF",
