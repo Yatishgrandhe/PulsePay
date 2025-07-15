@@ -191,7 +191,7 @@ export default function AccountSetupPage() {
       setSuccess("Account setup completed successfully! Redirecting to your dashboard...");
       
       setTimeout(() => {
-        router.push('/profile');
+        router.push('/dashboard');
       }, 2000);
 
     } catch (error: unknown) {

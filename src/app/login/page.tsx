@@ -57,7 +57,7 @@ export default function LoginPage() {
         setSuccess("Login successful! Redirecting...");
         setTimeout(() => {
           if (setupCompleted) {
-            window.location.href = "/profile";
+            window.location.href = "/dashboard";
           } else {
             window.location.href = "/account-setup";
           }
