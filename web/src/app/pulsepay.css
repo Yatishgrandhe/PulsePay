@@ -1,0 +1,114 @@
+/* PulsePay Global Styles */
+:root {
+  --pulsepay-pink: #E573B7;
+  --pulsepay-purple: #7B61FF;
+  --pulsepay-gold: #FFD166;
+  --pulsepay-white: #FFFFFF;
+  --pulsepay-blue: #232946;
+  --pulsepay-shadow: #1A1A2E;
+  --background: #fff;
+  --foreground: #232946;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+body {
+  background: linear-gradient(135deg, var(--pulsepay-pink) 0%, var(--pulsepay-purple) 60%, var(--pulsepay-gold) 100%);
+  color: var(--foreground);
+  font-family: 'Inter', 'Montserrat', 'Poppins', 'Roboto', Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+}
+.pulsepay-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background: rgba(255,255,255,0.92);
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(35,41,70,0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pulsepay-logo {
+  width: 140px;
+  height: 140px;
+  border-radius: 2rem;
+  box-shadow: 0 4px 24px 0 rgba(123,97,255,0.18);
+  margin-bottom: 1.5rem;
+}
+.pulsepay-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--pulsepay-blue);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.pulsepay-desc {
+  font-size: 1.2rem;
+  color: var(--pulsepay-blue);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.pulsepay-btn-group {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+.pulsepay-btn {
+  padding: 0.9rem 2.2rem;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--pulsepay-pink), var(--pulsepay-purple), var(--pulsepay-gold));
+  color: #fff;
+  box-shadow: 0 2px 8px 0 rgba(123,97,255,0.12);
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  outline: none;
+}
+.pulsepay-btn:hover, .pulsepay-btn:focus {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px 0 rgba(123,97,255,0.18);
+}
+.pulsepay-btn.secondary {
+  background: var(--pulsepay-blue);
+  color: var(--pulsepay-gold);
+  border: 2px solid var(--pulsepay-gold);
+}
+.pulsepay-btn.alt {
+  background: var(--pulsepay-gold);
+  color: var(--pulsepay-blue);
+  border: 2px solid var(--pulsepay-blue);
+}
+.pulsepay-footer {
+  margin-top: 2rem;
+  color: var(--pulsepay-blue);
+  font-size: 0.95rem;
+  text-align: center;
+  opacity: 0.8;
+}
+@media (max-width: 600px) {
+  .pulsepay-container {
+    padding: 1rem 0.5rem;
+  }
+  .pulsepay-logo {
+    width: 90px;
+    height: 90px;
+  }
+  .pulsepay-title {
+    font-size: 2rem;
+  }
+} 

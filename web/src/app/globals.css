@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #232946;
+  --pulsepay-pink: #E573B7;
+  --pulsepay-purple: #7B61FF;
+  --pulsepay-gold: #FFD166;
+  --pulsepay-white: #FFFFFF;
+  --pulsepay-blue: #232946;
+  --pulsepay-shadow: #1A1A2E;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', 'Montserrat', 'Poppins', 'Roboto', Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg {
+  background: var(--pulsepay-white);
+}
