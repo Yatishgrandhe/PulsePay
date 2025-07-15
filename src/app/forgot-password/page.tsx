@@ -12,51 +12,46 @@ import {
   Alert,
   CircularProgress,
   InputAdornment,
-  IconButton,
-  Divider
+  IconButton
 } from "@mui/material";
 import { 
   Email, 
-  Lock, 
+  ArrowBack, 
   Visibility, 
   VisibilityOff,
   CheckCircle,
-  Error,
-  Google,
-  Apple
+  Error
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { supabase } from "@/utils/supabaseClient";
 import AnimatedLogo from "@/components/AnimatedLogo";
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ 
-        email, 
-        password 
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/forgot-password`,
       });
-      
+
       if (error) {
         setError(error.message);
       } else {
-        setSuccess("Login successful! Redirecting...");
-        setTimeout(() => {
-          window.location.href = "/profile";
-        }, 1500);
+        setSuccess("Password reset link sent! Check your email.");
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -65,28 +60,36 @@ export default function LoginPage() {
     }
   };
 
-  const handleMagicLink = async () => {
-    if (!email) {
-      setError("Please enter your email address first");
-      return;
-    }
-
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
 
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { error } = await supabase.auth.signInWithOtp({ 
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/profile`
-        }
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
       });
-      
+
       if (error) {
         setError(error.message);
       } else {
-        setSuccess("Magic link sent! Check your email.");
+        setSuccess("Password updated successfully! Redirecting to login...");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 2000);
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -157,11 +160,34 @@ export default function LoginPage() {
                   mb: 1
                 }}
               >
-                Welcome Back
+                Reset Password
               </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Sign in to your PulsePay account
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                Enter your email to receive a password reset link
               </Typography>
+            </Box>
+
+            {/* Back to Login Link */}
+            <Box sx={{ mb: 3 }}>
+              <Link href="/login" passHref>
+                <MuiLink
+                  component="span"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 1,
+                    color: "primary.main",
+                    textDecoration: "none",
+                    fontWeight: 500,
+                    "&:hover": {
+                      textDecoration: "underline"
+                    }
+                  }}
+                >
+                  <ArrowBack sx={{ fontSize: 20 }} />
+                  Back to Login
+                </MuiLink>
+              </Link>
             </Box>
 
             {/* Success/Error Messages */}
@@ -197,10 +223,10 @@ export default function LoginPage() {
               </motion.div>
             )}
 
-            {/* Login Form */}
+            {/* Reset Password Form */}
             <Box
               component="form"
-              onSubmit={handleLogin}
+              onSubmit={handleResetPassword}
               sx={{ display: "flex", flexDirection: "column", gap: 3 }}
             >
               <TextField
@@ -231,66 +257,6 @@ export default function LoginPage() {
                 }}
               />
 
-              <TextField
-                fullWidth
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock sx={{ color: "primary.main" }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                        sx={{ color: "primary.main" }}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 3,
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "primary.main",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "primary.main",
-                      borderWidth: 2,
-                    },
-                  },
-                }}
-              />
-
-              {/* Forgot Password Link */}
-              <Box sx={{ textAlign: "right" }}>
-                <Link href="/forgot-password" passHref>
-                  <MuiLink
-                    component="span"
-                    sx={{
-                      color: "primary.main",
-                      textDecoration: "none",
-                      fontWeight: 500,
-                      fontSize: "0.9rem",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    Forgot password?
-                  </MuiLink>
-                </Link>
-              </Box>
-
-              {/* Login Button */}
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -299,7 +265,7 @@ export default function LoginPage() {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  disabled={loading || !email || !password}
+                  disabled={loading || !email}
                   sx={{
                     py: 1.5,
                     borderRadius: 3,
@@ -322,98 +288,14 @@ export default function LoginPage() {
                   {loading ? (
                     <CircularProgress size={24} sx={{ color: "white" }} />
                   ) : (
-                    "Sign In"
+                    "Send Reset Link"
                   )}
                 </Button>
               </motion.div>
-
-              {/* Magic Link Button */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={handleMagicLink}
-                  disabled={loading || !email}
-                  sx={{
-                    py: 1.5,
-                    borderRadius: 3,
-                    borderColor: "primary.main",
-                    color: "primary.main",
-                    fontSize: "1rem",
-                    fontWeight: 500,
-                    textTransform: "none",
-                    "&:hover": {
-                      borderColor: "primary.dark",
-                      background: "rgba(123, 97, 255, 0.05)",
-                      transform: "translateY(-1px)",
-                    },
-                    "&:disabled": {
-                      borderColor: "rgba(0, 0, 0, 0.12)",
-                      color: "rgba(0, 0, 0, 0.38)",
-                    },
-                  }}
-                >
-                  {loading ? "Sending..." : "Sign in with Magic Link"}
-                </Button>
-              </motion.div>
             </Box>
 
-            {/* Divider */}
-            <Box sx={{ my: 3 }}>
-              <Divider>
-                <Typography variant="body2" color="text.secondary">
-                  or continue with
-                </Typography>
-              </Divider>
-            </Box>
-
-            {/* Social Login Buttons */}
-            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<Google />}
-                sx={{
-                  py: 1.5,
-                  borderRadius: 3,
-                  borderColor: "#DB4437",
-                  color: "#DB4437",
-                  textTransform: "none",
-                  fontWeight: 500,
-                  "&:hover": {
-                    borderColor: "#C5392B",
-                    background: "rgba(219, 68, 55, 0.05)",
-                  },
-                }}
-              >
-                Google
-              </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<Apple />}
-                sx={{
-                  py: 1.5,
-                  borderRadius: 3,
-                  borderColor: "#000000",
-                  color: "#000000",
-                  textTransform: "none",
-                  fontWeight: 500,
-                  "&:hover": {
-                    borderColor: "#333333",
-                    background: "rgba(0, 0, 0, 0.05)",
-                  },
-                }}
-              >
-                Apple
-              </Button>
-            </Box>
-
-            {/* Sign Up Link */}
-            <Box sx={{ textAlign: "center", pt: 2, borderTop: "1px solid rgba(0, 0, 0, 0.1)" }}>
+            {/* Additional Help */}
+            <Box sx={{ textAlign: "center", mt: 4, pt: 3, borderTop: "1px solid rgba(0, 0, 0, 0.1)" }}>
               <Typography variant="body2" color="text.secondary">
                 Don't have an account?{" "}
                 <Link href="/register" passHref>
