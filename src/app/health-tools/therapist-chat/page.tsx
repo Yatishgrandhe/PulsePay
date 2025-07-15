@@ -28,10 +28,44 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-// Type declaration for Web Speech API
+// Type declarations for Web Speech API
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+}
+
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
 declare global {
   interface Window {
-    webkitSpeechRecognition: any;
+    webkitSpeechRecognition: new () => SpeechRecognition;
   }
 }
 
@@ -65,18 +99,17 @@ export default function TherapistChatPage() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Initialize speech recognition
   useEffect(() => {
     if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current = new window.webkitSpeechRecognition();
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
       recognitionRef.current.lang = 'en-US';
       
-      recognitionRef.current.onresult = (event: any) => {
+      recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
         let finalTranscript = '';
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -91,7 +124,7 @@ export default function TherapistChatPage() {
         }
       };
       
-      recognitionRef.current.onerror = (event: any) => {
+      recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
@@ -102,107 +135,7 @@ export default function TherapistChatPage() {
     }
   }, [isVoiceChat]);
 
-  const handleVoiceMessage = useCallback((message: string) => {
-    if (!currentChat) return;
-    
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: message,
-      sender: "user",
-      timestamp: new Date()
-    };
-
-    // Update chat with user message
-    const updatedChat = {
-      ...currentChat,
-      messages: [...currentChat.messages, userMessage],
-      title: currentChat.messages.length === 0 ? message.slice(0, 30) + "..." : currentChat.title,
-      updatedAt: new Date()
-    };
-
-    setCurrentChat(updatedChat);
-    setChatSessions(prev => 
-      prev.map(chat => 
-        chat.id === updatedChat.id ? updatedChat : chat
-      )
-    );
-
-    // Generate AI response
-    generateResponse(message);
-  }, [currentChat]);
-
-  // Load chats from localStorage on component mount
-  useEffect(() => {
-    const savedChats = localStorage.getItem('therapist-chats');
-    if (savedChats) {
-      const parsedChats = JSON.parse(savedChats).map((chat: ChatSession) => ({
-        ...chat,
-        createdAt: new Date(chat.createdAt),
-        updatedAt: new Date(chat.updatedAt),
-        messages: chat.messages.map((msg: Message) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp)
-        }))
-      }));
-      setChatSessions(parsedChats);
-      
-      // Load the most recent chat
-      if (parsedChats.length > 0) {
-        setCurrentChat(parsedChats[0]);
-      }
-    }
-  }, []);
-
-  // Save chats to localStorage whenever they change
-  useEffect(() => {
-    if (chatSessions.length > 0) {
-      localStorage.setItem('therapist-chats', JSON.stringify(chatSessions));
-    }
-  }, [chatSessions]);
-
-  // Scroll to bottom when new messages are added (but not during typing)
-  useEffect(() => {
-    if (currentChat?.messages.length && !isTyping) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-  }, [currentChat?.messages, isTyping]);
-
-  const createNewChat = () => {
-    const newChat: ChatSession = {
-      id: Date.now().toString(),
-      title: "New Chat",
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    setChatSessions(prev => [newChat, ...prev]);
-    setCurrentChat(newChat);
-    setInputText("");
-    
-    // Focus on input after creating new chat
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
-  };
-
-  const selectChat = (chat: ChatSession) => {
-    setCurrentChat(chat);
-    setInputText("");
-  };
-
-  const deleteChat = (chatId: string) => {
-    setChatSessions(prev => prev.filter(chat => chat.id !== chatId));
-    if (currentChat?.id === chatId) {
-      setCurrentChat(chatSessions.find(chat => chat.id !== chatId) || null);
-    }
-    setDeleteDialogOpen(false);
-    setChatToDelete(null);
-  };
-
-  const generateResponse = async (userMessage: string) => {
+  const generateResponse = useCallback(async (userMessage: string) => {
     if (!currentChat) return;
 
     setLoading(true);
@@ -282,6 +215,106 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
       setLoading(false);
       setIsTyping(false);
     }
+  }, [currentChat]);
+
+  const handleVoiceMessage = useCallback((message: string) => {
+    if (!currentChat) return;
+    
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: message,
+      sender: "user",
+      timestamp: new Date()
+    };
+
+    // Update chat with user message
+    const updatedChat = {
+      ...currentChat,
+      messages: [...currentChat.messages, userMessage],
+      title: currentChat.messages.length === 0 ? message.slice(0, 30) + "..." : currentChat.title,
+      updatedAt: new Date()
+    };
+
+    setCurrentChat(updatedChat);
+    setChatSessions(prev => 
+      prev.map(chat => 
+        chat.id === updatedChat.id ? updatedChat : chat
+      )
+    );
+
+    // Generate AI response
+    generateResponse(message);
+  }, [currentChat, generateResponse]);
+
+  // Load chats from localStorage on component mount
+  useEffect(() => {
+    const savedChats = localStorage.getItem('therapist-chats');
+    if (savedChats) {
+      const parsedChats = JSON.parse(savedChats).map((chat: ChatSession) => ({
+        ...chat,
+        createdAt: new Date(chat.createdAt),
+        updatedAt: new Date(chat.updatedAt),
+        messages: chat.messages.map((msg: Message) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }))
+      }));
+      setChatSessions(parsedChats);
+      
+      // Load the most recent chat
+      if (parsedChats.length > 0) {
+        setCurrentChat(parsedChats[0]);
+      }
+    }
+  }, []);
+
+  // Save chats to localStorage whenever they change
+  useEffect(() => {
+    if (chatSessions.length > 0) {
+      localStorage.setItem('therapist-chats', JSON.stringify(chatSessions));
+    }
+  }, [chatSessions]);
+
+  // Scroll to bottom when new messages are added (but not during typing)
+  useEffect(() => {
+    if (currentChat?.messages.length && !isTyping) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [currentChat?.messages, isTyping]);
+
+  const createNewChat = () => {
+    const newChat: ChatSession = {
+      id: Date.now().toString(),
+      title: "New Chat",
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    setChatSessions(prev => [newChat, ...prev]);
+    setCurrentChat(newChat);
+    setInputText("");
+    
+    // Focus on input after creating new chat
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+  };
+
+  const selectChat = (chat: ChatSession) => {
+    setCurrentChat(chat);
+    setInputText("");
+  };
+
+  const deleteChat = (chatId: string) => {
+    setChatSessions(prev => prev.filter(chat => chat.id !== chatId));
+    if (currentChat?.id === chatId) {
+      setCurrentChat(chatSessions.find(chat => chat.id !== chatId) || null);
+    }
+    setDeleteDialogOpen(false);
+    setChatToDelete(null);
   };
 
   const handleSendMessage = async () => {
