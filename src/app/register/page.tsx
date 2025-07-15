@@ -75,14 +75,14 @@ export default function RegisterPage() {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${window.location.origin}/profile`
+          emailRedirectTo: `${window.location.origin}/account-setup`
         }
       });
       
       if (error) {
         setError(error.message);
       } else {
-        setSuccess("Registration successful! Check your email to confirm your account.");
+        setSuccess("Registration successful! Please check your email to verify your account before completing setup.");
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");

@@ -173,7 +173,7 @@ export default function Home() {
                 >
                   <Button 
                     component={Link}
-                    href="/pay"
+                    href="/register"
                     variant="contained" 
                     size="large" 
                     onClick={() => console.log('Get Started clicked')}
@@ -232,37 +232,6 @@ export default function Home() {
                     }}
                   >
                     Login
-                  </Button>
-                  
-                  <Button 
-                    component={Link}
-                    href="/register"
-                    variant="outlined" 
-                    size="large" 
-                    onClick={() => console.log('Sign Up clicked')}
-                    sx={{ 
-                      borderRadius: 50, 
-                      fontWeight: 700, 
-                      color: "white",
-                      borderColor: "rgba(255,255,255,0.5)",
-                      px: 6,
-                      py: 2,
-                      fontSize: "1.1rem",
-                      position: 'relative',
-                      zIndex: 10,
-                      cursor: 'pointer',
-                      "&:hover": {
-                        borderColor: "white",
-                        background: "rgba(255,255,255,0.1)",
-                        transform: "translateY(-2px)",
-                      },
-                      "&:active": {
-                        transform: "translateY(0px)",
-                      },
-                      transition: "all 0.3s ease"
-                    }}
-                  >
-                    Sign Up
                   </Button>
                 </Stack>
               </motion.div>

@@ -42,7 +42,7 @@ export default function LoginPage() {
     setSuccess(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ 
+      const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
@@ -50,9 +50,17 @@ export default function LoginPage() {
       if (error) {
         setError(error.message);
       } else {
+        // Check if user has completed account setup
+        const userMetadata = data.user?.user_metadata;
+        const setupCompleted = userMetadata?.setup_completed;
+        
         setSuccess("Login successful! Redirecting...");
         setTimeout(() => {
-          window.location.href = "/profile";
+          if (setupCompleted) {
+            window.location.href = "/profile";
+          } else {
+            window.location.href = "/account-setup";
+          }
         }, 1500);
       }
     } catch {
