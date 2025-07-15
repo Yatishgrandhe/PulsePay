@@ -22,9 +22,11 @@ import {
   Delete,
   Chat,
   Mic,
-  GraphicEq
+  GraphicEq,
+  ArrowBack
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 interface Message {
   id: string;
@@ -251,7 +253,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
     <Box sx={{ 
       height: "100vh", 
       display: "flex", 
-      background: "#343541",
+      background: "#f7f7f8",
       position: "relative"
     }}>
       {/* Top Bar */}
@@ -261,8 +263,8 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
         left: 0,
         right: 0,
         height: "48px",
-        background: "#202123",
-        borderBottom: "1px solid #565869",
+        background: "linear-gradient(135deg, #E573B7, #7B61FF)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -270,33 +272,24 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
         zIndex: 1100
       }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Psychology sx={{ fontSize: 20, color: "#ececf1" }} />
-          <Typography variant="h6" sx={{ color: "#ececf1", fontWeight: 600 }}>
+          <Psychology sx={{ fontSize: 20, color: "white" }} />
+          <Typography variant="h6" sx={{ color: "white", fontWeight: 600 }}>
             Therapist Chat
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            sx={{
-              background: "#8e8ea0",
-              color: "#202123",
-              "&:hover": {
-                background: "#ececf1",
-              },
-              textTransform: "none",
-              fontWeight: 600,
-              px: 2,
-              py: 0.5,
-              borderRadius: 1
-            }}
-          >
-            Get Plus
-          </Button>
-          <Avatar sx={{ width: 32, height: 32, background: "#10a37f", fontSize: "14px" }}>
-            YG
-          </Avatar>
+          <Link href="/health-tools" passHref>
+            <IconButton
+              sx={{
+                color: "white",
+                "&:hover": {
+                  background: "rgba(255, 255, 255, 0.1)",
+                },
+              }}
+            >
+              <ArrowBack />
+            </IconButton>
+          </Link>
         </Box>
       </Box>
 
@@ -308,8 +301,9 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
           top: "48px",
           height: "calc(100vh - 48px)",
           width: "260px",
-          background: "#202123",
-          borderRight: "1px solid #565869",
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(20px)",
+          borderRight: "1px solid rgba(255, 255, 255, 0.2)",
           display: "flex",
           flexDirection: "column",
           zIndex: 1000
@@ -323,11 +317,11 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
             startIcon={<Add />}
             onClick={createNewChat}
             sx={{
-              borderColor: "#565869",
-              color: "#ececf1",
+              borderColor: "rgba(123, 97, 255, 0.3)",
+              color: "#7B61FF",
               "&:hover": {
-                borderColor: "#ececf1",
-                background: "rgba(236, 236, 241, 0.1)",
+                borderColor: "#7B61FF",
+                background: "rgba(123, 97, 255, 0.1)",
               },
               py: 1.5,
               borderRadius: 1,
@@ -340,14 +334,14 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
           </Button>
         </Box>
         
-        <Divider sx={{ borderColor: "#565869", mx: 2 }} />
+        <Divider sx={{ borderColor: "rgba(123, 97, 255, 0.2)", mx: 2 }} />
         
         {/* Chat History */}
         <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
           <Typography 
             variant="body2" 
             sx={{ 
-              color: "#8e8ea0", 
+              color: "#7B61FF", 
               fontSize: "12px", 
               fontWeight: 600, 
               mb: 2, 
@@ -357,70 +351,70 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
             CHATS
           </Typography>
           {chatSessions.map((chat) => (
-            <Box
-              key={chat.id}
-              onClick={() => selectChat(chat)}
-              sx={{
-                p: 1.5,
-                borderRadius: 1,
-                mb: 1,
-                cursor: "pointer",
-                background: currentChat?.id === chat.id ? "rgba(236, 236, 241, 0.1)" : "transparent",
-                "&:hover": {
-                  background: "rgba(236, 236, 241, 0.1)",
-                },
-                display: "flex",
-                alignItems: "center",
-                gap: 1
-              }}
-            >
-              <Chat sx={{ fontSize: 16, color: "#ececf1" }} />
-              <Typography
-                variant="body2"
+                          <Box
+                key={chat.id}
+                onClick={() => selectChat(chat)}
                 sx={{
-                  color: "#ececf1",
-                  fontWeight: currentChat?.id === chat.id ? 600 : 400,
-                  flex: 1,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  fontSize: "14px"
-                }}
-              >
-                {chat.title}
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setChatToDelete(chat.id);
-                  setDeleteDialogOpen(true);
-                }}
-                sx={{
-                  color: "transparent",
-                  p: 0.5,
+                  p: 1.5,
+                  borderRadius: 1,
+                  mb: 1,
+                  cursor: "pointer",
+                  background: currentChat?.id === chat.id ? "rgba(123, 97, 255, 0.1)" : "transparent",
                   "&:hover": {
-                    color: "#f44336",
-                    background: "rgba(244, 67, 54, 0.1)",
+                    background: "rgba(123, 97, 255, 0.1)",
                   },
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1
                 }}
               >
-                <Delete sx={{ fontSize: 14 }} />
-              </IconButton>
-            </Box>
+                <Chat sx={{ fontSize: 16, color: "#7B61FF" }} />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#333",
+                    fontWeight: currentChat?.id === chat.id ? 600 : 400,
+                    flex: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    fontSize: "14px"
+                  }}
+                >
+                  {chat.title}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setChatToDelete(chat.id);
+                    setDeleteDialogOpen(true);
+                  }}
+                  sx={{
+                    color: "transparent",
+                    p: 0.5,
+                    "&:hover": {
+                      color: "#f44336",
+                      background: "rgba(244, 67, 54, 0.1)",
+                    },
+                  }}
+                >
+                  <Delete sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Box>
           ))}
         </Box>
 
         {/* Bottom Section */}
-        <Box sx={{ p: 2, borderTop: "1px solid #565869" }}>
+        <Box sx={{ p: 2, borderTop: "1px solid rgba(123, 97, 255, 0.2)" }}>
           <Button
             fullWidth
             variant="text"
             startIcon={<Add />}
             sx={{
-              color: "#8e8ea0",
+              color: "#7B61FF",
               "&:hover": {
-                background: "rgba(236, 236, 241, 0.1)",
+                background: "rgba(123, 97, 255, 0.1)",
               },
               textTransform: "none",
               fontWeight: 500,
@@ -433,7 +427,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
           <Typography 
             variant="caption" 
             sx={{ 
-              color: "#8e8ea0", 
+              color: "#666", 
               fontSize: "12px", 
               display: "block", 
               mt: 0.5, 
@@ -457,7 +451,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
         <Box sx={{ 
           flex: 1, 
           overflow: "auto", 
-          background: "#343541",
+          background: "#ffffff",
           display: "flex",
           flexDirection: "column"
         }}>
@@ -483,7 +477,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 What are you working on?
               </Typography>
             </Box>
-          ) : currentChat.messages.length === 0 ? (
+                      ) : currentChat.messages.length === 0 ? (
             <Box sx={{ 
               display: "flex", 
               flexDirection: "column", 
@@ -498,7 +492,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 sx={{ 
                   fontWeight: 600, 
                   mb: 2, 
-                  color: "#ececf1",
+                  color: "#333",
                   fontSize: "32px"
                 }}
               >
@@ -521,15 +515,15 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                         display: "flex",
                         gap: 3,
                         p: 4,
-                        background: message.sender === "user" ? "#343541" : "#444654",
-                        borderBottom: "1px solid #565869"
+                        background: message.sender === "user" ? "#f7f7f8" : "#ffffff",
+                        borderBottom: "1px solid #e5e5e5"
                       }}
                     >
                       <Avatar
                         sx={{
                           width: 30,
                           height: 30,
-                          background: message.sender === "user" ? "#10a37f" : "#7B61FF",
+                          background: message.sender === "user" ? "#7B61FF" : "#10a37f",
                           color: "white",
                           fontSize: "14px",
                           flexShrink: 0
@@ -542,7 +536,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                           variant="body1"
                           sx={{
                             lineHeight: 1.6,
-                            color: "#ececf1",
+                            color: "#374151",
                             whiteSpace: "pre-wrap",
                             fontSize: "16px"
                           }}
@@ -566,8 +560,8 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                       display: "flex",
                       gap: 3,
                       p: 4,
-                      background: "#444654",
-                      borderBottom: "1px solid #565869"
+                      background: "#ffffff",
+                      borderBottom: "1px solid #e5e5e5"
                     }}
                   >
                     <Avatar
@@ -584,8 +578,8 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                     </Avatar>
                     <Box sx={{ flex: 1, maxWidth: "800px", mx: "auto" }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <CircularProgress size={16} sx={{ color: "#ececf1" }} />
-                        <Typography variant="body2" sx={{ color: "#ececf1" }}>
+                        <CircularProgress size={16} sx={{ color: "#7B61FF" }} />
+                        <Typography variant="body2" sx={{ color: "#666" }}>
                           Typing...
                         </Typography>
                       </Box>
@@ -604,8 +598,8 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
           <Box
             sx={{
               p: 4,
-              background: "#343541",
-              borderTop: "1px solid #565869"
+              background: "#ffffff",
+              borderTop: "1px solid #e5e5e5"
             }}
           >
             <Box
@@ -627,48 +621,48 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 top: 12,
                 zIndex: 1
               }}>
-                <Add sx={{ fontSize: 16, color: "#8e8ea0" }} />
-                <Typography variant="body2" sx={{ color: "#8e8ea0", fontSize: "14px" }}>
+                <Add sx={{ fontSize: 16, color: "#666" }} />
+                <Typography variant="body2" sx={{ color: "#666", fontSize: "14px" }}>
                   Tools
                 </Typography>
               </Box>
-              <TextField
-                ref={inputRef}
-                fullWidth
-                multiline
-                maxRows={4}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask anything"
-                variant="outlined"
-                disabled={loading}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 3,
-                    background: "#40414f",
-                    border: "1px solid #565869",
-                    pl: 8,
-                    pr: 8,
-                    "&:hover": {
-                      borderColor: "#ececf1",
-                    },
-                    "&.Mui-focused": {
-                      borderColor: "#ececf1",
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#ececf1",
+                              <TextField
+                  ref={inputRef}
+                  fullWidth
+                  multiline
+                  maxRows={4}
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask anything"
+                  variant="outlined"
+                  disabled={loading}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 3,
+                      background: "#ffffff",
+                      border: "1px solid #e5e5e5",
+                      pl: 8,
+                      pr: 8,
+                      "&:hover": {
+                        borderColor: "#7B61FF",
                       },
-                    },
-                    "& .MuiInputBase-input": {
-                      color: "#ececf1",
-                      "&::placeholder": {
-                        color: "#8e8ea0",
-                        opacity: 1
+                      "&.Mui-focused": {
+                        borderColor: "#7B61FF",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#7B61FF",
+                        },
+                      },
+                      "& .MuiInputBase-input": {
+                        color: "#333",
+                        "&::placeholder": {
+                          color: "#666",
+                          opacity: 1
+                        }
                       }
-                    }
-                  },
-                }}
-              />
+                    },
+                  }}
+                />
               <Box sx={{
                 position: "absolute",
                 right: 12,
@@ -680,10 +674,10 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 <IconButton
                   size="small"
                   sx={{
-                    color: "#8e8ea0",
+                    color: "#666",
                     p: 0.5,
                     "&:hover": {
-                      color: "#ececf1",
+                      color: "#7B61FF",
                     },
                   }}
                 >
@@ -692,10 +686,10 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 <IconButton
                   size="small"
                   sx={{
-                    color: "#8e8ea0",
+                    color: "#666",
                     p: 0.5,
                     "&:hover": {
-                      color: "#ececf1",
+                      color: "#7B61FF",
                     },
                   }}
                 >
@@ -706,13 +700,13 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                   disabled={!inputText.trim() || loading}
                   size="small"
                   sx={{
-                    color: inputText.trim() ? "#ececf1" : "#8e8ea0",
+                    color: inputText.trim() ? "#7B61FF" : "#666",
                     p: 0.5,
                     "&:hover": {
-                      color: "#ececf1",
+                      color: "#7B61FF",
                     },
                     "&:disabled": {
-                      color: "#565869",
+                      color: "#ccc",
                     },
                   }}
                 >
