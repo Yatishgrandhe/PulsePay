@@ -87,7 +87,7 @@ export default function RegisterPage() {
       } else {
         setSuccess("Registration successful! Check your email to confirm your account.");
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);

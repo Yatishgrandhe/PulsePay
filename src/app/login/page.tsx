@@ -58,7 +58,7 @@ export default function LoginPage() {
           window.location.href = "/profile";
         }, 1500);
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -88,7 +88,7 @@ export default function LoginPage() {
       } else {
         setSuccess("Magic link sent! Check your email.");
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -415,7 +415,7 @@ export default function LoginPage() {
             {/* Sign Up Link */}
             <Box sx={{ textAlign: "center", pt: 2, borderTop: "1px solid rgba(0, 0, 0, 0.1)" }}>
               <Typography variant="body2" color="text.secondary">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/register" passHref>
                   <MuiLink
                     component="span"

@@ -11,14 +11,11 @@ import {
   Link as MuiLink,
   Alert,
   CircularProgress,
-  InputAdornment,
-  IconButton
+  InputAdornment
 } from "@mui/material";
 import { 
   Email, 
   ArrowBack, 
-  Visibility, 
-  VisibilityOff,
   CheckCircle,
   Error
 } from "@mui/icons-material";
@@ -32,10 +29,6 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [resetToken, setResetToken] = useState<string | null>(null);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,45 +46,7 @@ export default function ForgotPasswordPage() {
       } else {
         setSuccess("Password reset link sent! Check your email.");
       }
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) {
-        setError(error.message);
-      } else {
-        setSuccess("Password updated successfully! Redirecting to login...");
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 2000);
-      }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -297,7 +252,7 @@ export default function ForgotPasswordPage() {
             {/* Additional Help */}
             <Box sx={{ textAlign: "center", mt: 4, pt: 3, borderTop: "1px solid rgba(0, 0, 0, 0.1)" }}>
               <Typography variant="body2" color="text.secondary">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/register" passHref>
                   <MuiLink
                     component="span"

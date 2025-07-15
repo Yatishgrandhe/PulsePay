@@ -11,6 +11,7 @@ import AnimatedLogo from './AnimatedLogo';
 const navItems = [
   { name: 'Home', path: '/' },
   { name: 'How It Works', path: '/how-it-works' },
+  { name: 'Health Tools', path: '/health-tools' },
   { name: 'Partner Hospitals', path: '/hospitals' },
   { name: 'Partner Banks', path: '/banks' },
   { name: 'Login', path: '/login' },
