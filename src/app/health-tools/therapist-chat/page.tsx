@@ -555,7 +555,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                 sx={{ 
                   fontWeight: 600, 
                   mb: 2, 
-                  color: "#ececf1",
+                  color: "#333",
                   fontSize: "32px"
                 }}
               >
@@ -698,7 +698,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
               }}
             >
 
-                              <TextField
+                <TextField
                   ref={inputRef}
                   fullWidth
                   multiline
@@ -706,16 +706,14 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                   value={isListening ? transcript : inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder={isListening ? "Listening..." : "Ask anything"}
+                  placeholder={isListening ? "Listening..." : "Message Therapist Chat..."}
                   variant="outlined"
                   disabled={loading || isListening}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      borderRadius: 3,
+                      borderRadius: 2,
                       background: isListening ? "#fff3e0" : "#ffffff",
                       border: isListening ? "1px solid #ff9800" : "1px solid #e5e5e5",
-                      pl: 8,
-                      pr: 8,
                       "&:hover": {
                         borderColor: "#7B61FF",
                       },
@@ -781,12 +779,14 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
                   disabled={(!inputText.trim() && !transcript.trim()) || loading}
                   size="small"
                   sx={{
-                    color: (inputText.trim() || transcript.trim()) ? "#7B61FF" : "#666",
-                    p: 0.5,
+                    background: (inputText.trim() || transcript.trim()) ? "#7B61FF" : "#e5e5e5",
+                    color: (inputText.trim() || transcript.trim()) ? "white" : "#999",
+                    p: 1,
                     "&:hover": {
-                      color: "#7B61FF",
+                      background: (inputText.trim() || transcript.trim()) ? "#6B51EF" : "#e5e5e5",
                     },
                     "&:disabled": {
+                      background: "#e5e5e5",
                       color: "#ccc",
                     },
                   }}
