@@ -28,9 +28,9 @@ import AnimatedLogo from "@/components/AnimatedLogo";
 
 const healthTools = [
   {
-    id: "therapist-chat",
-    title: "Therapist Chat",
-    description: "AI-powered mental health support with professional guidance",
+          id: "therapist-chat",
+      title: "Friendly Chat Support",
+      description: "Talk to a caring friend who's here to listen and help",
     icon: <Psychology sx={{ fontSize: 40, color: "#E573B7" }} />,
     features: ["24/7 Support", "AI-Powered", "Private & Secure"],
     color: "linear-gradient(135deg, #E573B7, #7B61FF)",

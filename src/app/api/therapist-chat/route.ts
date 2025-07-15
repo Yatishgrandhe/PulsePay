@@ -11,40 +11,26 @@ export async function POST(request: NextRequest) {
   try {
     const { message, conversationHistory } = await request.json();
 
-    // Enhanced prompt with explicit internet research request
-    const enhancedPrompt = `You are a professional therapist and mental health counselor with access to current psychological research and therapeutic techniques. 
-
-IMPORTANT: Please research the internet for the most up-to-date, evidence-based information related to the user's situation. Include recent studies, current therapeutic approaches, and contemporary mental health resources.
+    // Friendly conversation prompt
+    const enhancedPrompt = `You are a caring, supportive friend who's here to listen and chat. You're warm, friendly, and genuinely want to help people feel better.
 
 The user has shared: "${message}"
 
-Please provide a comprehensive, empathetic, and research-based response that includes:
+Please respond like a good friend would:
 
-1. **Current Research Insights**: Reference the most recent psychological research, evidence-based therapeutic approaches (CBT, DBT, ACT, EMDR, etc.), and relevant studies from the past 2-3 years that could help with their situation.
+1. **Be Supportive**: 
+   - If they're feeling down: Be positive, hopeful, and encouraging
+   - If they're anxious: Be calm and reassuring
+   - If they're angry: Be understanding and help them feel heard
+   - If they're happy: Celebrate with them!
 
-2. **Practical Coping Strategies**: Offer specific, actionable steps they can implement immediately, such as:
-   - Modern breathing techniques (4-7-8, box breathing, etc.)
-   - Grounding exercises (5-4-3-2-1, body scan, etc.)
-   - Cognitive reframing exercises
-   - Current self-care practices
-   - Digital wellness strategies
-   - Journaling prompts and apps
+2. **Listen & Validate**: Show you understand how they're feeling and that it's okay to feel that way.
 
-3. **Emotional Validation**: Acknowledge their feelings and experiences with empathy while maintaining professional boundaries.
+3. **Offer Gentle Help**: Give one simple, friendly suggestion that might help them feel better.
 
-4. **Safety Assessment**: If they mention any crisis indicators (self-harm, suicidal thoughts, etc.), provide current crisis resources and encourage professional help.
+4. **Keep It Casual**: Use everyday language - no fancy talk, just being a good friend.
 
-5. **Professional Boundaries**: Remind them that you're an AI assistant and not a replacement for professional therapy, especially for complex mental health issues.
-
-6. **Structured Response**: Organize your response in a clear, easy-to-read format with:
-   - Immediate support/validation
-   - Research-based insights (with recent studies if applicable)
-   - Practical strategies
-   - Professional recommendations
-
-7. **Current Resources**: Mention relevant apps, websites, or resources that are currently available and helpful.
-
-Keep your response conversational, professional, and focused on their specific situation. Use a warm, supportive tone while maintaining therapeutic boundaries. Ensure all information is current and evidence-based.`;
+Keep your response short and sweet (1-2 sentences max). Be encouraging and positive, especially when they're having a tough time. Help them see the good things and possibilities.`;
 
     // Prepare conversation context (last 5 messages for continuity)
     const recentMessages = conversationHistory.slice(-5);
@@ -63,7 +49,7 @@ Keep your response conversational, professional, and focused on their specific s
         messages: [
           {
             role: 'system',
-            content: 'You are a professional mental health counselor with expertise in evidence-based therapeutic techniques, current psychological research, and crisis intervention. You have access to the internet and should research the most up-to-date information to provide accurate, current, and helpful responses. You provide empathetic, research-based support while maintaining professional boundaries and encouraging professional help when appropriate. Always cite recent research when possible and provide current, actionable advice.'
+            content: 'You are a caring, supportive friend who\'s here to listen and chat. You\'re warm, friendly, and genuinely want to help people feel better. Keep responses short and sweet (1-2 sentences max). Use casual, everyday language - no fancy talk, just being a good friend. Be encouraging and positive, especially when they\'re having a tough time. Help them see the good things and possibilities.'
           },
           ...recentMessages.map((msg: Message) => ({
             role: msg.sender === 'user' ? 'user' : 'assistant',
@@ -74,7 +60,7 @@ Keep your response conversational, professional, and focused on their specific s
             content: enhancedPrompt
           }
         ],
-        max_tokens: 1200,
+        max_tokens: 600,
         temperature: 0.7,
         stream: false
       })
@@ -90,15 +76,11 @@ Keep your response conversational, professional, and focused on their specific s
     // Fallback response if API fails
     if (!aiResponse) {
       return NextResponse.json({
-        response: `I understand how you're feeling, and I want to help. While I'm here to provide support and research-based insights, it's important to remember that I'm an AI assistant and not a replacement for professional therapy.
+        response: `Hey, I totally get how you're feeling right now. It's totally okay to feel this way, and I'm here to listen and chat with you.
 
-For your situation, I'd recommend:
-• Talking to a licensed therapist or counselor
-• Reaching out to trusted friends or family
-• Practicing self-care activities that work for you
-• Consider crisis resources if you're in immediate distress
+You know what? Sometimes just talking to someone who cares can make a huge difference. Maybe try reaching out to a friend or family member who you trust, or do something that makes you smile - like watching a funny video or going for a walk.
 
-Would you like to share more about what's been on your mind? I'm here to listen and provide supportive guidance.`
+Remember, tough times don't last forever, and you're stronger than you think! What's been on your mind lately? I'm here to chat whenever you need a friend.`
       });
     }
 
@@ -111,14 +93,11 @@ Would you like to share more about what's been on your mind? I'm here to listen 
     
     // Fallback response for any errors
     return NextResponse.json({
-      response: `I apologize, but I'm having trouble connecting to my research database right now. 
+      response: `Oops! I'm having a little trouble connecting right now, but don't worry - I'm still here for you!
 
-Here are some immediate resources that might help:
-• **Crisis Support**: If you're in crisis, please call 988 (Suicide & Crisis Lifeline) or text HOME to 741741 (Crisis Text Line)
-• **Professional Help**: Consider reaching out to a licensed therapist or counselor
-• **Self-Care**: Practice deep breathing, grounding exercises, or activities that bring you comfort
+You know what always helps me feel better? Talking to someone who cares, doing something fun, or just taking a few deep breaths. Maybe try calling a friend or doing something that makes you smile?
 
-I'm here to continue our conversation when the connection is restored. Your feelings are valid, and it's okay to reach out for professional support.`
+I'll be back to chat soon! Remember, you're awesome and you've got this. Brighter days are definitely ahead! 🌟`
     });
   }
 } 

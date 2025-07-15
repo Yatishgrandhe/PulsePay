@@ -150,22 +150,10 @@ export default function TherapistChatPage() {
     setIsTyping(true);
 
     try {
-      // Enhanced prompt with internet research capability
-      const enhancedPrompt = `You are a professional therapist and mental health counselor. The user has shared: "${userMessage}"
+      // Simple message for friendly chat
+      const enhancedPrompt = `The user has shared: "${userMessage}"
 
-Please provide a comprehensive, empathetic, and helpful response. Consider the following:
-
-1. **Research-based insights**: Include relevant psychological research, therapeutic techniques, or evidence-based approaches that could help with their situation.
-
-2. **Practical advice**: Offer actionable steps or coping strategies they can implement.
-
-3. **Emotional support**: Show empathy and understanding while maintaining professional boundaries.
-
-4. **Safety considerations**: If they mention self-harm, crisis, or emergency situations, provide appropriate crisis resources and encourage professional help.
-
-5. **Professional boundaries**: Remind them that you're an AI assistant and not a replacement for professional therapy.
-
-Format your response in a clear, structured way that's easy to read and understand. Keep it conversational but professional.`;
+Please respond like a caring, supportive friend who's here to listen and chat. Be warm, friendly, and genuinely helpful. Keep your response short and sweet (1-2 sentences max). Use casual, everyday language - no fancy talk, just being a good friend. Be encouraging and positive, especially when they're having a tough time.`;
 
       // Simulate API call with typing effect
       const response = await fetch('/api/therapist-chat', {
@@ -188,7 +176,7 @@ Format your response in a clear, structured way that's easy to read and understa
       // Simulate typing effect
       const aiMessage: Message = {
         id: Date.now().toString(),
-        text: data.response || "I understand how you're feeling. Let me provide some helpful insights and strategies that might help you navigate this situation...",
+        text: data.response || "Hey, I totally get how you're feeling right now. It's totally okay to feel this way, and I'm here to listen and chat with you!",
         sender: "ai",
         timestamp: new Date()
       };
@@ -212,7 +200,7 @@ Format your response in a clear, structured way that's easy to read and understa
       // Fallback response
       const fallbackMessage: Message = {
         id: Date.now().toString(),
-        text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment, or consider reaching out to a professional therapist for immediate support.",
+        text: "Oops! I'm having a little trouble connecting right now, but don't worry - I'm still here for you! Maybe try calling a friend or doing something that makes you smile?",
         sender: "ai",
         timestamp: new Date()
       };
@@ -328,7 +316,7 @@ Format your response in a clear, structured way that's easy to read and understa
                   }}
                 >
                   <Psychology sx={{ fontSize: 24 }} />
-                  AI Therapist Chat
+                  Friendly Chat Support
                 </Typography>
                 <Typography
                   variant="body2"
@@ -337,7 +325,7 @@ Format your response in a clear, structured way that's easy to read and understa
                     fontSize: "0.8rem"
                   }}
                 >
-                  Professional mental health support
+                  Talk to a caring friend who&apos;s here to listen
                 </Typography>
               </Box>
             </Box>
@@ -411,11 +399,11 @@ Format your response in a clear, structured way that's easy to read and understa
               }}>
                 <Psychology sx={{ fontSize: 64, color: "#7B61FF", mb: 3 }} />
                 <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
-                  Welcome to AI Therapist Chat
+                  Welcome to Friendly Chat Support
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: "500px" }}>
-                  Start a new conversation to get professional mental health support, 
-                  research-based insights, and practical coping strategies.
+                  Start a new conversation to chat with a caring friend who&apos;s here to listen, 
+                  offer support, and help you feel better.
                 </Typography>
                 <Button
                   variant="contained"
@@ -453,8 +441,7 @@ Format your response in a clear, structured way that's easy to read and understa
                   Ready to Chat
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: "400px" }}>
-                  Share what&apos;s on your mind. I&apos;m here to provide research-based insights, 
-                  practical strategies, and empathetic support.
+                  Share what&apos;s on your mind. I&apos;m here to listen, chat, and help you feel better.
                 </Typography>
                 
                 {/* Helpful Tips Cards */}
@@ -473,10 +460,10 @@ Format your response in a clear, structured way that's easy to read and understa
                     minWidth: "150px"
                   }}>
                     <Typography variant="body2" sx={{ fontWeight: 500, color: "#7B61FF" }}>
-                      💡 Research-Based
+                      💡 Caring & Supportive
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Get insights from current psychological research
+                      Get friendly advice and emotional support
                     </Typography>
                   </Paper>
                   
@@ -503,10 +490,10 @@ Format your response in a clear, structured way that's easy to read and understa
                     minWidth: "150px"
                   }}>
                     <Typography variant="body2" sx={{ fontWeight: 500, color: "#4CAF50" }}>
-                      🎯 Practical Tips
+                      🎯 Helpful Ideas
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Actionable strategies you can use today
+                      Simple things you can try to feel better
                     </Typography>
                   </Paper>
                 </Box>
