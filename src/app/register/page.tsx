@@ -13,7 +13,6 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
-  Divider,
   Checkbox,
   FormControlLabel
 } from "@mui/material";
@@ -24,9 +23,7 @@ import {
   Visibility, 
   VisibilityOff,
   CheckCircle,
-  Error,
-  Google,
-  Apple
+  Error
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -141,7 +138,11 @@ export default function RegisterPage() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <AnimatedLogo size={60} variant="compact" showWhiteCircle={false} />
+                <Link href="/" passHref>
+                  <Box sx={{ cursor: "pointer", display: "inline-block" }}>
+                    <AnimatedLogo size={60} variant="compact" showWhiteCircle={false} />
+                  </Box>
+                </Link>
               </motion.div>
               <Typography
                 variant="h4"
@@ -420,57 +421,6 @@ export default function RegisterPage() {
                   )}
                 </Button>
               </motion.div>
-            </Box>
-
-            {/* Divider */}
-            <Box sx={{ my: 3 }}>
-              <Divider>
-                <Typography variant="body2" color="text.secondary">
-                  or sign up with
-                </Typography>
-              </Divider>
-            </Box>
-
-            {/* Social Register Buttons */}
-            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<Google />}
-                sx={{
-                  py: 1.5,
-                  borderRadius: 3,
-                  borderColor: "#DB4437",
-                  color: "#DB4437",
-                  textTransform: "none",
-                  fontWeight: 500,
-                  "&:hover": {
-                    borderColor: "#C5392B",
-                    background: "rgba(219, 68, 55, 0.05)",
-                  },
-                }}
-              >
-                Google
-              </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<Apple />}
-                sx={{
-                  py: 1.5,
-                  borderRadius: 3,
-                  borderColor: "#000000",
-                  color: "#000000",
-                  textTransform: "none",
-                  fontWeight: 500,
-                  "&:hover": {
-                    borderColor: "#333333",
-                    background: "rgba(0, 0, 0, 0.05)",
-                  },
-                }}
-              >
-                Apple
-              </Button>
             </Box>
 
             {/* Sign In Link */}
