@@ -313,10 +313,10 @@ export default function FitnessPlannerPage() {
                 </Stepper>
               </Paper>
             </motion.div>
-          </Grid>
+          </Box>
 
           {/* Main Content */}
-          <Grid item xs={12} md={8}>
+          <Box sx={{ width: { xs: "100%", md: "66.667%" } }}>
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -622,8 +622,8 @@ export default function FitnessPlannerPage() {
                       </Button>
                     </Box>
 
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} md={6}>
+                    <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3 }}>
+                      <Box sx={{ width: { xs: "100%", md: "50%" } }}>
                         <Card sx={{ borderRadius: 3, height: "100%" }}>
                           <CardContent>
                             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
