@@ -3,35 +3,28 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   Box, 
-  Container, 
   Typography, 
-  Paper, 
   Button, 
   IconButton,
   TextField,
   Avatar,
   CircularProgress,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Divider
 } from "@mui/material";
 import { 
   Send, 
   Psychology, 
-  ArrowBack,
   Add,
   Delete,
-  Chat
+  Chat,
+  Mic,
+  GraphicEq
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import AnimatedLogo from "@/components/AnimatedLogo";
 
 interface Message {
   id: string;
@@ -55,7 +48,6 @@ export default function TherapistChatPage() {
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   
@@ -100,14 +92,6 @@ export default function TherapistChatPage() {
     }
   }, [currentChat?.messages, isTyping]);
 
-  // Don't scroll during typing - let user maintain their position
-  useEffect(() => {
-    if (isTyping) {
-      // Don't scroll during typing - let user maintain their position
-      return;
-    }
-  }, [isTyping]);
-
   const createNewChat = () => {
     const newChat: ChatSession = {
       id: Date.now().toString(),
@@ -119,7 +103,6 @@ export default function TherapistChatPage() {
     
     setChatSessions(prev => [newChat, ...prev]);
     setCurrentChat(newChat);
-    setSidebarOpen(false);
     setInputText("");
     
     // Focus on input after creating new chat
@@ -130,7 +113,6 @@ export default function TherapistChatPage() {
 
   const selectChat = (chat: ChatSession) => {
     setCurrentChat(chat);
-    setSidebarOpen(false);
     setInputText("");
   };
 
@@ -190,14 +172,16 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
       };
 
       setCurrentChat(updatedChat);
-      setChatSessions(prev => prev.map(chat => 
-        chat.id === currentChat.id ? updatedChat : chat
-      ));
+      setChatSessions(prev => 
+        prev.map(chat => 
+          chat.id === updatedChat.id ? updatedChat : chat
+        )
+      );
 
     } catch (error) {
       console.error('Error generating response:', error);
       
-      // Fallback response
+      // Fallback message
       const fallbackMessage: Message = {
         id: Date.now().toString(),
         text: "Oops! I'm having a little trouble connecting right now, but don't worry - I'm still here for you! Maybe try calling a friend or doing something that makes you smile?",
@@ -212,9 +196,11 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
       };
 
       setCurrentChat(updatedChat);
-      setChatSessions(prev => prev.map(chat => 
-        chat.id === currentChat.id ? updatedChat : chat
-      ));
+      setChatSessions(prev => 
+        prev.map(chat => 
+          chat.id === updatedChat.id ? updatedChat : chat
+        )
+      );
     } finally {
       setLoading(false);
       setIsTyping(false);
@@ -222,7 +208,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
   };
 
   const handleSendMessage = async () => {
-    if (!inputText.trim() || loading || !currentChat) return;
+    if (!inputText.trim() || !currentChat || loading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -240,14 +226,16 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
     };
 
     setCurrentChat(updatedChat);
-    setChatSessions(prev => prev.map(chat => 
-      chat.id === currentChat.id ? updatedChat : chat
-    ));
+    setChatSessions(prev => 
+      prev.map(chat => 
+        chat.id === updatedChat.id ? updatedChat : chat
+      )
+    );
 
     setInputText("");
     
     // Generate AI response
-    await generateResponse(inputText.trim());
+    await generateResponse(userMessage.text);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -257,521 +245,492 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
     }
   };
 
-  const formatDate = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    
-    if (days === 0) {
-      return 'Today';
-    } else if (days === 1) {
-      return 'Yesterday';
-    } else if (days < 7) {
-      return `${days} days ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
-  };
+
 
   return (
-    <Box sx={{ minHeight: "100vh", background: "#f8f9ff" }}>
-      {/* Header */}
+    <Box sx={{ 
+      height: "100vh", 
+      display: "flex", 
+      background: "#343541",
+      position: "relative"
+    }}>
+      {/* Top Bar */}
+      <Box sx={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: "48px",
+        background: "#202123",
+        borderBottom: "1px solid #565869",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        px: 3,
+        zIndex: 1100
+      }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Psychology sx={{ fontSize: 20, color: "#ececf1" }} />
+          <Typography variant="h6" sx={{ color: "#ececf1", fontWeight: 600 }}>
+            Therapist Chat
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            sx={{
+              background: "#8e8ea0",
+              color: "#202123",
+              "&:hover": {
+                background: "#ececf1",
+              },
+              textTransform: "none",
+              fontWeight: 600,
+              px: 2,
+              py: 0.5,
+              borderRadius: 1
+            }}
+          >
+            Get Plus
+          </Button>
+          <Avatar sx={{ width: 32, height: 32, background: "#10a37f", fontSize: "14px" }}>
+            YG
+          </Avatar>
+        </Box>
+      </Box>
+
+      {/* Sidebar - Always visible like ChatGPT */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #E573B7, #7B61FF)",
-          py: 2,
-          position: "sticky",
-          top: 0,
+          position: "fixed",
+          left: 0,
+          top: "48px",
+          height: "calc(100vh - 48px)",
+          width: "260px",
+          background: "#202123",
+          borderRight: "1px solid #565869",
+          display: "flex",
+          flexDirection: "column",
           zIndex: 1000
         }}
       >
-        <Container maxWidth="lg">
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Link href="/health-tools" passHref>
-                <IconButton
-                  sx={{
-                    color: "white",
-                    mr: 2,
-                    "&:hover": {
-                      background: "rgba(255, 255, 255, 0.1)",
-                      transform: "translateX(-2px)",
-                    },
-                    transition: "all 0.3s ease"
-                  }}
-                >
-                  <ArrowBack />
-                </IconButton>
-              </Link>
-              <AnimatedLogo size={40} variant="compact" showWhiteCircle={false} />
-              <Box sx={{ ml: 2 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "white",
-                    fontWeight: 700,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1
-                  }}
-                >
-                  <Psychology sx={{ fontSize: 24 }} />
-                  Friendly Chat Support
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "rgba(255, 255, 255, 0.8)",
-                    fontSize: "0.8rem"
-                  }}
-                >
-                  Talk to a caring friend who&apos;s here to listen
-                </Typography>
-              </Box>
-            </Box>
-            
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                variant="outlined"
-                startIcon={<Add />}
-                onClick={createNewChat}
+        {/* New Chat Button */}
+        <Box sx={{ p: 2 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<Add />}
+            onClick={createNewChat}
+            sx={{
+              borderColor: "#565869",
+              color: "#ececf1",
+              "&:hover": {
+                borderColor: "#ececf1",
+                background: "rgba(236, 236, 241, 0.1)",
+              },
+              py: 1.5,
+              borderRadius: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              justifyContent: "flex-start"
+            }}
+          >
+            New chat
+          </Button>
+        </Box>
+        
+        <Divider sx={{ borderColor: "#565869", mx: 2 }} />
+        
+        {/* Chat History */}
+        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: "#8e8ea0", 
+              fontSize: "12px", 
+              fontWeight: 600, 
+              mb: 2, 
+              px: 1 
+            }}
+          >
+            CHATS
+          </Typography>
+          {chatSessions.map((chat) => (
+            <Box
+              key={chat.id}
+              onClick={() => selectChat(chat)}
+              sx={{
+                p: 1.5,
+                borderRadius: 1,
+                mb: 1,
+                cursor: "pointer",
+                background: currentChat?.id === chat.id ? "rgba(236, 236, 241, 0.1)" : "transparent",
+                "&:hover": {
+                  background: "rgba(236, 236, 241, 0.1)",
+                },
+                display: "flex",
+                alignItems: "center",
+                gap: 1
+              }}
+            >
+              <Chat sx={{ fontSize: 16, color: "#ececf1" }} />
+              <Typography
+                variant="body2"
                 sx={{
-                  borderColor: "rgba(255, 255, 255, 0.3)",
-                  color: "white",
-                  "&:hover": {
-                    borderColor: "white",
-                    background: "rgba(255, 255, 255, 0.1)",
-                  },
+                  color: "#ececf1",
+                  fontWeight: currentChat?.id === chat.id ? 600 : 400,
+                  flex: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  fontSize: "14px"
                 }}
               >
-                New Chat
-              </Button>
+                {chat.title}
+              </Typography>
               <IconButton
-                onClick={() => setSidebarOpen(true)}
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setChatToDelete(chat.id);
+                  setDeleteDialogOpen(true);
+                }}
                 sx={{
-                  color: "white",
+                  color: "transparent",
+                  p: 0.5,
                   "&:hover": {
-                    background: "rgba(255, 255, 255, 0.1)",
+                    color: "#f44336",
+                    background: "rgba(244, 67, 54, 0.1)",
                   },
                 }}
               >
-                <Chat />
+                <Delete sx={{ fontSize: 14 }} />
               </IconButton>
             </Box>
-          </Box>
-        </Container>
+          ))}
+        </Box>
+
+        {/* Bottom Section */}
+        <Box sx={{ p: 2, borderTop: "1px solid #565869" }}>
+          <Button
+            fullWidth
+            variant="text"
+            startIcon={<Add />}
+            sx={{
+              color: "#8e8ea0",
+              "&:hover": {
+                background: "rgba(236, 236, 241, 0.1)",
+              },
+              textTransform: "none",
+              fontWeight: 500,
+              justifyContent: "flex-start",
+              fontSize: "14px"
+            }}
+          >
+            Upgrade plan
+          </Button>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: "#8e8ea0", 
+              fontSize: "12px", 
+              display: "block", 
+              mt: 0.5, 
+              px: 1 
+            }}
+          >
+            More access to the best models
+          </Typography>
+        </Box>
       </Box>
 
       {/* Main Chat Area */}
-      <Container maxWidth="lg" sx={{ py: 2, height: "calc(100vh - 120px)" }}>
-        <Paper
-          elevation={8}
-          sx={{
-            height: "100%",
-            borderRadius: 3,
-            overflow: "hidden",
-            background: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            display: "flex",
-            flexDirection: "column"
-          }}
-        >
-          {/* Messages Area */}
-          <Box
-            sx={{
-              flex: 1,
-              overflow: "auto",
-              p: 3,
-              display: "flex",
-              flexDirection: "column",
-              gap: 2
-            }}
-          >
-            {!currentChat ? (
-              <Box sx={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                alignItems: "center", 
-                justifyContent: "center", 
-                height: "100%",
-                textAlign: "center"
-              }}>
-                <Psychology sx={{ fontSize: 64, color: "#7B61FF", mb: 3 }} />
-                <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
-                  Welcome to Friendly Chat Support
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: "500px" }}>
-                  Start a new conversation to chat with a caring friend who&apos;s here to listen, 
-                  offer support, and help you feel better.
-                </Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={createNewChat}
-                  sx={{
-                    background: "linear-gradient(135deg, #E573B7, #7B61FF)",
-                    "&:hover": {
-                      background: "linear-gradient(135deg, #D563A7, #6B51EF)",
-                    },
-                    px: 4,
-                    py: 1.5,
-                    borderRadius: 3,
-                    fontSize: "1.1rem",
-                    fontWeight: 600,
-                    textTransform: "none"
-                  }}
-                >
-                  Start New Chat
-                </Button>
-              </Box>
-            ) : currentChat.messages.length === 0 ? (
-              // Show helpful tips before first message
-              <Box sx={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                alignItems: "center", 
-                justifyContent: "center", 
-                height: "100%",
-                textAlign: "center",
-                p: 3
-              }}>
-                <Psychology sx={{ fontSize: 48, color: "#7B61FF", mb: 2 }} />
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                  Ready to Chat
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: "400px" }}>
-                  Share what&apos;s on your mind. I&apos;m here to listen, chat, and help you feel better.
-                </Typography>
-                
-                {/* Helpful Tips Cards */}
-                <Box sx={{ 
-                  display: "flex", 
-                  flexWrap: "wrap", 
-                  gap: 2, 
-                  justifyContent: "center",
-                  maxWidth: "600px"
-                }}>
-                  <Paper sx={{ 
-                    p: 2, 
-                    borderRadius: 2, 
-                    background: "rgba(123, 97, 255, 0.1)",
-                    border: "1px solid rgba(123, 97, 255, 0.2)",
-                    minWidth: "150px"
-                  }}>
-                    <Typography variant="body2" sx={{ fontWeight: 500, color: "#7B61FF" }}>
-                      💡 Caring & Supportive
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Get friendly advice and emotional support
-                    </Typography>
-                  </Paper>
-                  
-                  <Paper sx={{ 
-                    p: 2, 
-                    borderRadius: 2, 
-                    background: "rgba(229, 115, 183, 0.1)",
-                    border: "1px solid rgba(229, 115, 183, 0.2)",
-                    minWidth: "150px"
-                  }}>
-                    <Typography variant="body2" sx={{ fontWeight: 500, color: "#E573B7" }}>
-                      🛡️ Safe & Private
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Your conversations are confidential
-                    </Typography>
-                  </Paper>
-                  
-                  <Paper sx={{ 
-                    p: 2, 
-                    borderRadius: 2, 
-                    background: "rgba(76, 175, 80, 0.1)",
-                    border: "1px solid rgba(76, 175, 80, 0.2)",
-                    minWidth: "150px"
-                  }}>
-                    <Typography variant="body2" sx={{ fontWeight: 500, color: "#4CAF50" }}>
-                      🎯 Helpful Ideas
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Simple things you can try to feel better
-                    </Typography>
-                  </Paper>
-                </Box>
-              </Box>
-            ) : (
-              <>
-                <AnimatePresence>
-                  {currentChat.messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: message.sender === "user" ? "flex-end" : "flex-start",
-                          mb: 2,
-                          px: { xs: 1, sm: 2 }
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            maxWidth: { xs: "90%", sm: "80%", md: "70%" },
-                            display: "flex",
-                            alignItems: "flex-start",
-                            gap: 2,
-                            flexDirection: message.sender === "user" ? "row-reverse" : "row"
-                          }}
-                        >
-                          <Avatar
-                            sx={{
-                              width: { xs: 32, sm: 40 },
-                              height: { xs: 32, sm: 40 },
-                              background: message.sender === "ai" 
-                                ? "linear-gradient(135deg, #E573B7, #7B61FF)"
-                                : "linear-gradient(135deg, #7B61FF, #4CAF50)",
-                              fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                              flexShrink: 0
-                            }}
-                          >
-                            {message.sender === "ai" ? "AI" : "You"}
-                          </Avatar>
-                          <Paper
-                            sx={{
-                              p: { xs: 2, sm: 3 },
-                              borderRadius: 3,
-                              background: message.sender === "user" 
-                                ? "linear-gradient(135deg, #7B61FF, #4CAF50)"
-                                : "rgba(255, 255, 255, 0.9)",
-                              color: message.sender === "user" ? "white" : "text.primary",
-                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                              maxWidth: "100%",
-                              wordBreak: "break-word"
-                            }}
-                          >
-                            <Typography
-                              variant="body1"
-                              sx={{
-                                lineHeight: 1.6,
-                                whiteSpace: "pre-wrap",
-                                fontSize: { xs: "0.9rem", sm: "1rem" }
-                              }}
-                            >
-                              {message.text}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                display: "block",
-                                mt: 1,
-                                opacity: 0.7,
-                                fontSize: "0.75rem"
-                              }}
-                            >
-                              {message.timestamp.toLocaleTimeString([], { 
-                                hour: '2-digit', 
-                                minute: '2-digit' 
-                              })}
-                            </Typography>
-                          </Paper>
-                        </Box>
-                      </Box>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                
-                {isTyping && (
+      <Box sx={{ 
+        flex: 1, 
+        display: "flex", 
+        flexDirection: "column",
+        ml: "260px",
+        mt: "48px"
+      }}>
+        {/* Messages Area */}
+        <Box sx={{ 
+          flex: 1, 
+          overflow: "auto", 
+          background: "#343541",
+          display: "flex",
+          flexDirection: "column"
+        }}>
+          {!currentChat ? (
+            <Box sx={{ 
+              display: "flex", 
+              flexDirection: "column", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              height: "100%",
+              textAlign: "center",
+              p: 4
+            }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  fontWeight: 600, 
+                  mb: 2, 
+                  color: "#ececf1",
+                  fontSize: "32px"
+                }}
+              >
+                What are you working on?
+              </Typography>
+            </Box>
+          ) : currentChat.messages.length === 0 ? (
+            <Box sx={{ 
+              display: "flex", 
+              flexDirection: "column", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              height: "100%",
+              textAlign: "center",
+              p: 4
+            }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  fontWeight: 600, 
+                  mb: 2, 
+                  color: "#ececf1",
+                  fontSize: "32px"
+                }}
+              >
+                What are you working on?
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <AnimatePresence>
+                {currentChat.messages.map((message) => (
                   <motion.div
+                    key={message.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2, px: { xs: 1, sm: 2 } }}>
-                      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
-                        <Avatar
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 3,
+                        p: 4,
+                        background: message.sender === "user" ? "#343541" : "#444654",
+                        borderBottom: "1px solid #565869"
+                      }}
+                    >
+                      <Avatar
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          background: message.sender === "user" ? "#10a37f" : "#7B61FF",
+                          color: "white",
+                          fontSize: "14px",
+                          flexShrink: 0
+                        }}
+                      >
+                        {message.sender === "user" ? "U" : "T"}
+                      </Avatar>
+                      <Box sx={{ flex: 1, maxWidth: "800px", mx: "auto" }}>
+                        <Typography
+                          variant="body1"
                           sx={{
-                            width: { xs: 32, sm: 40 },
-                            height: { xs: 32, sm: 40 },
-                            background: "linear-gradient(135deg, #E573B7, #7B61FF)",
-                            fontSize: { xs: "0.8rem", sm: "0.9rem" }
+                            lineHeight: 1.6,
+                            color: "#ececf1",
+                            whiteSpace: "pre-wrap",
+                            fontSize: "16px"
                           }}
                         >
-                          AI
-                        </Avatar>
-                        <Paper
-                          sx={{
-                            p: { xs: 2, sm: 3 },
-                            borderRadius: 3,
-                            background: "rgba(255, 255, 255, 0.9)",
-                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 2
-                          }}
-                        >
-                          <CircularProgress size={20} sx={{ color: "#7B61FF" }} />
-                          <Typography variant="body2" color="text.secondary">
-                            AI is thinking...
-                          </Typography>
-                        </Paper>
+                          {message.text}
+                        </Typography>
                       </Box>
                     </Box>
                   </motion.div>
-                )}
-                
-                <div ref={messagesEndRef} />
-              </>
-            )}
-          </Box>
+                ))}
+              </AnimatePresence>
+              
+              {isTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 3,
+                      p: 4,
+                      background: "#444654",
+                      borderBottom: "1px solid #565869"
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        width: 30,
+                        height: 30,
+                        background: "#7B61FF",
+                        color: "white",
+                        fontSize: "14px",
+                        flexShrink: 0
+                      }}
+                    >
+                      T
+                    </Avatar>
+                    <Box sx={{ flex: 1, maxWidth: "800px", mx: "auto" }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <CircularProgress size={16} sx={{ color: "#ececf1" }} />
+                        <Typography variant="body2" sx={{ color: "#ececf1" }}>
+                          Typing...
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </motion.div>
+              )}
+              
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </Box>
 
-          {/* Input Area */}
-          {currentChat && (
+        {/* Input Area */}
+        {currentChat && (
+          <Box
+            sx={{
+              p: 4,
+              background: "#343541",
+              borderTop: "1px solid #565869"
+            }}
+          >
             <Box
               sx={{
-                p: 3,
-                borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-                background: "rgba(255, 255, 255, 0.95)"
+                display: "flex",
+                gap: 2,
+                alignItems: "flex-end",
+                maxWidth: "800px",
+                mx: "auto",
+                position: "relative"
               }}
             >
-              <Box sx={{ display: "flex", gap: 2, alignItems: "flex-end" }}>
-                <TextField
-                  ref={inputRef}
-                  fullWidth
-                  multiline
-                  maxRows={4}
-                  placeholder="Share what's on your mind... I'm here to help with research-based insights and practical strategies."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  disabled={loading || isTyping}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 3,
-                      background: "rgba(255, 255, 255, 0.8)",
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#7B61FF",
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#7B61FF",
-                        borderWidth: 2,
-                      },
-                    },
-                  }}
-                />
-                <IconButton
-                  onClick={handleSendMessage}
-                  disabled={!inputText.trim() || loading || isTyping}
-                  sx={{
-                    background: "linear-gradient(135deg, #E573B7, #7B61FF)",
-                    color: "white",
-                    p: 1.5,
+              <Box sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                position: "absolute",
+                left: 12,
+                top: 12,
+                zIndex: 1
+              }}>
+                <Add sx={{ fontSize: 16, color: "#8e8ea0" }} />
+                <Typography variant="body2" sx={{ color: "#8e8ea0", fontSize: "14px" }}>
+                  Tools
+                </Typography>
+              </Box>
+              <TextField
+                ref={inputRef}
+                fullWidth
+                multiline
+                maxRows={4}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask anything"
+                variant="outlined"
+                disabled={loading}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 3,
+                    background: "#40414f",
+                    border: "1px solid #565869",
+                    pl: 8,
+                    pr: 8,
                     "&:hover": {
-                      background: "linear-gradient(135deg, #D563A7, #6B51EF)",
-                      transform: "scale(1.05)",
+                      borderColor: "#ececf1",
                     },
-                    "&:disabled": {
-                      background: "rgba(0, 0, 0, 0.12)",
-                      color: "rgba(0, 0, 0, 0.38)",
+                    "&.Mui-focused": {
+                      borderColor: "#ececf1",
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#ececf1",
+                      },
                     },
-                    transition: "all 0.3s ease"
+                    "& .MuiInputBase-input": {
+                      color: "#ececf1",
+                      "&::placeholder": {
+                        color: "#8e8ea0",
+                        opacity: 1
+                      }
+                    }
+                  },
+                }}
+              />
+              <Box sx={{
+                position: "absolute",
+                right: 12,
+                top: 12,
+                display: "flex",
+                alignItems: "center",
+                gap: 1
+              }}>
+                <IconButton
+                  size="small"
+                  sx={{
+                    color: "#8e8ea0",
+                    p: 0.5,
+                    "&:hover": {
+                      color: "#ececf1",
+                    },
                   }}
                 >
-                  <Send />
+                  <Mic sx={{ fontSize: 16 }} />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  sx={{
+                    color: "#8e8ea0",
+                    p: 0.5,
+                    "&:hover": {
+                      color: "#ececf1",
+                    },
+                  }}
+                >
+                  <GraphicEq sx={{ fontSize: 16 }} />
+                </IconButton>
+                <IconButton
+                  onClick={handleSendMessage}
+                  disabled={!inputText.trim() || loading}
+                  size="small"
+                  sx={{
+                    color: inputText.trim() ? "#ececf1" : "#8e8ea0",
+                    p: 0.5,
+                    "&:hover": {
+                      color: "#ececf1",
+                    },
+                    "&:disabled": {
+                      color: "#565869",
+                    },
+                  }}
+                >
+                  <Send sx={{ fontSize: 16 }} />
                 </IconButton>
               </Box>
             </Box>
-          )}
-        </Paper>
-      </Container>
-
-      {/* Chat History Sidebar */}
-      <Drawer
-        anchor="left"
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        sx={{
-          "& .MuiDrawer-paper": {
-            width: 320,
-            background: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)"
-          }
-        }}
-      >
-        <Box sx={{ p: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              Chat History
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={createNewChat}
-              sx={{
-                background: "linear-gradient(135deg, #E573B7, #7B61FF)",
-                "&:hover": {
-                  background: "linear-gradient(135deg, #D563A7, #6B51EF)",
-                },
-                borderRadius: 2,
-                textTransform: "none"
-              }}
-            >
-              New
-            </Button>
           </Box>
-          
-          <List sx={{ p: 0 }}>
-            {chatSessions.map((chat) => (
-              <ListItem
-                key={chat.id}
-                sx={{
-                  borderRadius: 2,
-                  mb: 1,
-                  background: currentChat?.id === chat.id ? "rgba(123, 97, 255, 0.1)" : "transparent",
-                  "&:hover": {
-                    background: "rgba(123, 97, 255, 0.05)",
-                  },
-                  cursor: "pointer"
-                }}
-                onClick={() => selectChat(chat)}
-              >
-                <ListItemIcon>
-                  <Chat sx={{ color: "#7B61FF" }} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={chat.title}
-                  secondary={formatDate(chat.updatedAt)}
-                  primaryTypographyProps={{
-                    sx: { fontWeight: currentChat?.id === chat.id ? 600 : 400 }
-                  }}
-                />
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setChatToDelete(chat.id);
-                    setDeleteDialogOpen(true);
-                  }}
-                  sx={{
-                    color: "#F44336",
-                    "&:hover": {
-                      background: "rgba(244, 67, 54, 0.1)",
-                    }
-                  }}
-                >
-                  <Delete fontSize="small" />
-                </IconButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      </Drawer>
+        )}
+      </Box>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Delete Chat</DialogTitle>
         <DialogContent>
           <Typography>
@@ -780,7 +739,7 @@ Please respond like a caring, supportive friend who's here to listen and chat. B
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button 
+          <Button
             onClick={() => chatToDelete && deleteChat(chatToDelete)}
             color="error"
             variant="contained"

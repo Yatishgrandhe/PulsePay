@@ -29,7 +29,7 @@ import AnimatedLogo from "@/components/AnimatedLogo";
 const healthTools = [
   {
           id: "therapist-chat",
-      title: "Friendly Chat Support",
+      title: "Therapist Chat",
       description: "Talk to a caring friend who's here to listen and help",
     icon: <Psychology sx={{ fontSize: 40, color: "#E573B7" }} />,
     features: ["24/7 Support", "AI-Powered", "Private & Secure"],
