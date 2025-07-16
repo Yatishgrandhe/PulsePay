@@ -9,28 +9,24 @@ import {
   Card,
   CardContent,
   Button,
-  Avatar,
   Chip,
+  CircularProgress,
+  Alert,
+  Avatar,
   Divider,
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
-  CircularProgress,
-  Alert,
-  Grid
+  ListItemIcon
 } from "@mui/material";
 import { 
   Psychology as PsychologyIcon,
   HealthAndSafety as HealthIcon,
-  History as HistoryIcon,
   Person as PersonIcon,
-  TrendingUp as TrendingUpIcon,
   SmartToy as AIIcon,
-  Receipt as ReceiptIcon,
-  Add as AddIcon,
+  Analytics as AnalyticsIcon,
   ArrowForward as ArrowForwardIcon,
-  Analytics as AnalyticsIcon
+  Add as AddIcon
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -38,17 +34,24 @@ import { supabase } from "@/utils/supabaseClient";
 import AnimatedLogo from "@/components/AnimatedLogo";
 import Link from "next/link";
 
+interface RecentActivity {
+  id: string;
+  session_type?: string;
+  tool_type?: string;
+  created_at: string;
+}
+
 interface DashboardStats {
   totalDiagnoses: number;
   healthScore: number;
   aiSessions: number;
-  recentActivities: any[];
+  recentActivities: RecentActivity[];
 }
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: any } | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: { full_name?: string } } | null>(null);
   const [stats, setStats] = useState<DashboardStats>({
     totalDiagnoses: 0,
     healthScore: 85,
@@ -59,6 +62,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (!supabase) return;
+      
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -95,8 +100,8 @@ export default function DashboardPage() {
             recentActivities
           });
         }
-      } catch (error: any) {
-        setError(error.message || 'Failed to load dashboard data');
+      } catch (error: unknown) {
+        setError(error instanceof Error ? error.message : 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -219,7 +224,7 @@ export default function DashboardPage() {
                 Welcome back, {user?.user_metadata?.full_name || 'User'}!
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Here's your health AI dashboard
+                Here&apos;s your health AI dashboard
               </Typography>
             </Box>
 
@@ -241,17 +246,6 @@ export default function DashboardPage() {
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       AI Diagnoses
-                    </Typography>
-                  </CardContent>
-                </Card>
-                <Card sx={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
-                  <CardContent sx={{ textAlign: 'center' }}>
-                    <TrendingUpIcon sx={{ fontSize: 40, color: 'success.main', mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.main', mb: 1 }}>
-                      {stats.healthScore}%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Health Score
                     </Typography>
                   </CardContent>
                 </Card>
@@ -336,8 +330,6 @@ export default function DashboardPage() {
                 ))}
               </Box>
             </Box>
-
-            <Divider sx={{ my: 4 }} />
 
             {/* Recent Activities */}
             <Box sx={{ mb: 4 }}>

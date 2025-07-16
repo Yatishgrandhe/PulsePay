@@ -16,6 +16,11 @@ interface ChatRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Supabase is available
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const body: ChatRequest = await request.json();
     const { message, sessionId, localMessages } = body;
 
@@ -140,6 +145,8 @@ Remember: You're here to support and guide, not replace professional mental heal
 }
 
 async function transferLocalMessagesToDatabase(userId: string, sessionId: string, localMessages: ChatMessage[]) {
+  if (!supabase) return;
+
   try {
     // Check if session already exists
     const { data: existingSession } = await supabase
@@ -190,6 +197,11 @@ async function transferLocalMessagesToDatabase(userId: string, sessionId: string
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if Supabase is available
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');
     const authHeader = request.headers.get('authorization');

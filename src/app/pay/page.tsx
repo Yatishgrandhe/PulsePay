@@ -15,8 +15,6 @@ import {
   StepLabel,
   Card,
   CardContent,
-  InputAdornment,
-  IconButton,
   FormControl,
   InputLabel,
   Select,
@@ -29,12 +27,9 @@ import {
   Send as SendIcon,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
   ArrowForward as ArrowForwardIcon,
   ArrowBack as ArrowBackIcon,
-  Receipt as ReceiptIcon,
-  Psychology as PsychologyIcon
+  Receipt as ReceiptIcon
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -52,6 +47,22 @@ interface ServiceData {
   appointmentDate: string;
   appointmentTime: string;
   priority: 'routine' | 'urgent' | 'emergency';
+}
+
+interface ServiceResult {
+  id: string;
+  serviceType: string;
+  serviceName: string;
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  description: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  priority: string;
+  price: number;
+  status: string;
+  created_at: string;
 }
 
 const steps = [
@@ -73,8 +84,7 @@ export default function HealthServicePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: { full_name?: string } } | null>(null);
-  const [serviceResult, setServiceResult] = useState<any>(null);
+  const [serviceResult, setServiceResult] = useState<ServiceResult | null>(null);
   const router = useRouter();
 
   const [serviceData, setServiceData] = useState<ServiceData>({
@@ -91,13 +101,13 @@ export default function HealthServicePage() {
 
   useEffect(() => {
     const checkUser = async () => {
+      if (!supabase) return;
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/login');
         return;
       }
-      
-      setUser(user);
     };
     
     checkUser();
@@ -167,7 +177,7 @@ export default function HealthServicePage() {
   };
 
   const handleServiceBooking = async () => {
-    if (!validateStep(activeStep)) return;
+    if (!validateStep(activeStep) || !supabase) return;
     
     setLoading(true);
     setError(null);
@@ -207,8 +217,8 @@ export default function HealthServicePage() {
       setServiceResult(result.service);
       setSuccess("Health service booked successfully!");
       
-    } catch (error: any) {
-      setError(error.message || "An error occurred during service booking.");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred during service booking.");
     } finally {
       setLoading(false);
     }

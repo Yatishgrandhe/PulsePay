@@ -350,14 +350,14 @@ export default function HealthHistoryPage() {
                         <TableCell>
                           <Chip 
                             label={activity.activity_type === 'ai_chat' ? 'AI Session' : (activity.tool_type || 'Health Tool')} 
-                            color={getTypeColor(activity.activity_type) as any}
+                            color={getTypeColor(activity.activity_type) as 'primary' | 'secondary' | 'default'}
                             size="small"
                           />
                         </TableCell>
                         <TableCell>
                           <Chip 
                             label={activity.status} 
-                            color={getStatusColor(activity.status) as any}
+                            color={getStatusColor(activity.status) as 'success' | 'warning' | 'error' | 'default'}
                             size="small"
                           />
                         </TableCell>

@@ -39,66 +39,53 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) return;
+    
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ 
-        email, 
-        password 
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
-      
+
       if (error) {
         setError(error.message);
       } else {
-        // Check if user has completed account setup
-        const userMetadata = data.user?.user_metadata;
-        const setupCompleted = userMetadata?.setup_completed;
-        
-        setSuccess("Login successful! Redirecting...");
-        setTimeout(() => {
-          if (setupCompleted) {
-            window.location.href = "/dashboard";
-          } else {
-            window.location.href = "/account-setup";
-          }
-        }, 1500);
+        // Redirect to dashboard on success
+        window.location.href = '/dashboard';
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError('An error occurred during sign in');
     } finally {
-    setLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleMagicLink = async () => {
-    if (!email) {
-      setError("Please enter your email address first");
-      return;
-    }
-
+  const handleForgotPassword = async () => {
+    if (!email || !supabase) return;
+    
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({ 
+      const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/profile`
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
-      
+
       if (error) {
         setError(error.message);
       } else {
         setSuccess("Magic link sent! Check your email.");
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError('An error occurred while sending reset link');
     } finally {
-    setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -347,7 +334,7 @@ export default function LoginPage() {
                   <Button
                     fullWidth
                     variant="outlined"
-          onClick={handleMagicLink}
+          onClick={handleForgotPassword}
           disabled={loading || !email}
                     sx={{
                       py: 1.5,

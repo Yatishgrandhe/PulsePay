@@ -4,12 +4,10 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, 
   Group, 
   Psychology, 
   FlashOn,
   HealthAndSafety,
-  CheckCircle,
   SmartToy,
   Analytics
 } from '@mui/icons-material';

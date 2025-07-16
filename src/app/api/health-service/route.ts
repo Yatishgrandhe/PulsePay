@@ -16,6 +16,11 @@ interface HealthServiceRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Supabase is available
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     // Get user from auth header
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {
@@ -183,6 +188,8 @@ async function sendServiceConfirmationEmail({
   price: number;
   priority: string;
 }) {
+  if (!supabase) return;
+
   // Store email notification in database
   const { error } = await supabase
     .from('email_notifications')

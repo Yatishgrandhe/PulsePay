@@ -76,6 +76,8 @@ export default function AccountSetupPage() {
 
   useEffect(() => {
     const checkUser = async () => {
+      if (!supabase) return;
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/login');
@@ -147,7 +149,7 @@ export default function AccountSetupPage() {
   };
 
   const handleCompleteSetup = async () => {
-    if (!validateStep(activeStep)) return;
+    if (!validateStep(activeStep) || !supabase) return;
     
     setLoading(true);
     setError(null);

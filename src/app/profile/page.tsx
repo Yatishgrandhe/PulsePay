@@ -15,7 +15,6 @@ import {
   CardContent,
   Chip,
   Divider,
-  IconButton,
   InputAdornment
 } from "@mui/material";
 import { 
@@ -49,7 +48,7 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
-  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: any } | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: Record<string, unknown> } | null>(null);
   const [profile, setProfile] = useState<ProfileData>({
     fullName: '',
     email: '',
@@ -68,6 +67,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!supabase) return;
+      
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -100,7 +101,7 @@ export default function ProfilePage() {
         console.error('Error fetching profile:', error);
         setError('Failed to load profile data');
       } finally {
-      setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -116,7 +117,7 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
-      if (!user) return;
+    if (!user || !supabase) return;
 
     setSaving(true);
     setError(null);
@@ -150,8 +151,8 @@ export default function ProfilePage() {
       
       setTimeout(() => setSuccess(null), 3000);
 
-    } catch (error: any) {
-      setError(error.message || 'Failed to update profile');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to update profile');
     } finally {
       setSaving(false);
     }

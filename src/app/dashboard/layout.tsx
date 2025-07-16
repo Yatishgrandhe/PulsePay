@@ -22,7 +22,6 @@ import {
 } from "@mui/material";
 import {
   Dashboard as DashboardIcon,
-  AccountBalanceWallet as WalletIcon,
   Payment as PaymentIcon,
   History as HistoryIcon,
   Person as ProfileIcon,
@@ -91,6 +90,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) return;
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/login');
@@ -114,6 +115,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const handleSignOut = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
     router.push('/login');
   };

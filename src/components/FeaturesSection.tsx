@@ -5,9 +5,7 @@ import { motion } from 'framer-motion';
 import { 
   Psychology, 
   Speed, 
-  Public, 
   VerifiedUser,
-  Support,
   Analytics,
   HealthAndSafety,
   SmartToy

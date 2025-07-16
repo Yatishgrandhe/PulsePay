@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { 
   PersonAdd, 
   Psychology, 
-  Verified,
   Analytics as AnalyticsIcon,
   HealthAndSafety
 } from '@mui/icons-material';
@@ -112,81 +111,27 @@ export default function HowItWorksSection() {
                     left: 0,
                     right: 0,
                     height: 4,
-                    background: `linear-gradient(90deg, ${step.color}, ${step.color}80)`,
-                  }
+                    background: step.color,
+                  },
                 }}
               >
-                {/* Step number badge */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    background: step.color,
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                  }}
-                >
-                  {step.step}
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 80,
-                    height: 80,
-                    borderRadius: '50%',
-                    background: `linear-gradient(135deg, ${step.color}15, ${step.color}30)`,
-                    color: step.color,
-                    mb: 3,
-                    transition: 'all 0.3s ease',
-                  }}
-                >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   {step.icon}
+                  <Typography variant="h5" fontWeight={700} sx={{ ml: 2, color: step.color }}>
+                    Step {step.step}
+                  </Typography>
                 </Box>
-                
-                <Typography 
-                  variant="h5" 
-                  fontWeight={600}
-                  sx={{ mb: 2, color: 'text.primary' }}
-                >
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
                   {step.title}
                 </Typography>
-                
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    color: 'text.secondary',
-                    lineHeight: 1.6
-                  }}
-                >
+                <Typography variant="body1" color="text.secondary">
                   {step.description}
                 </Typography>
               </Paper>
             </motion.div>
           ))}
         </Box>
-
-        {/* Connection lines for desktop */}
-        <Box sx={{ 
-          display: { xs: 'none', md: 'block' },
-          position: 'relative',
-          mt: 4,
-          height: 2,
-          background: 'linear-gradient(90deg, #1E3A8A, #3B82F6, #10B981, #9CA3AF)',
-          borderRadius: 1,
-          opacity: 0.3
-        }} />
       </Box>
     </Box>
   );
-} 
+}
