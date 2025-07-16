@@ -1,5 +1,7 @@
-Build Version: 1.0.2
-Cache Bust: $(date +%s)
-Wallet Page: COMPLETELY REMOVED
+Build Version: 1.0.3
+Cache Bust: $(date +%s%N)
+Wallet Page: COMPLETELY REMOVED AND DELETED
 Build Time: $(date)
-Force Fresh Build: YES 
+Force Fresh Build: YES
+Force Rebuild: TRUE
+Cache Disabled: YES 

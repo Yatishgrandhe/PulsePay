@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "rm -rf .next && rm -rf src/app/dashboard/wallet && next build",
+    "build": "rm -rf .next && rm -rf src/app/dashboard/wallet && find . -name '*wallet*' -delete && next build",
     "start": "next start",
     "lint": "next lint"
   },

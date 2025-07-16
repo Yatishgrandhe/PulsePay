@@ -1,11 +1,23 @@
 {
-  "buildCommand": "rm -rf .next && npm run build",
+  "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
   "buildCache": false,
+  "ignoreCommand": "echo 'Forcing fresh build'",
   "functions": {
     "src/app/dashboard/wallet/page.tsx": {
       "maxDuration": 0
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ]
 }
