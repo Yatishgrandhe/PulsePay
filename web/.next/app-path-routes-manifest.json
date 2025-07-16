@@ -1,0 +1,17 @@
+{
+  "/api/health-service/route": "/api/health-service",
+  "/api/therapist-chat/route": "/api/therapist-chat",
+  "/auth/callback/route": "/auth/callback",
+  "/api/payment/route": "/api/payment",
+  "/_not-found/page": "/_not-found",
+  "/admin/page": "/admin",
+  "/account-setup/page": "/account-setup",
+  "/pay/page": "/pay",
+  "/profile/page": "/profile",
+  "/login/page": "/login",
+  "/forgot-password/page": "/forgot-password",
+  "/register/page": "/register",
+  "/dashboard/history/page": "/dashboard/history",
+  "/dashboard/wallet/page": "/dashboard/wallet",
+  "/dashboard/page": "/dashboard"
+}

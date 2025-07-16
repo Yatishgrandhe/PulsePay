@@ -61,6 +61,7 @@ export default function HealthHistoryPage() {
 
   useEffect(() => {
     const fetchActivities = async () => {
+      if (!supabase) return;
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {

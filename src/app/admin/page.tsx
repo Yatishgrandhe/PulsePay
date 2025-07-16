@@ -204,6 +204,7 @@ export default function AdminPage() {
   }, [user, refreshKey]);
 
   const checkAdminAccess = async () => {
+    if (!supabase) return;
     try {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) {
@@ -232,6 +233,7 @@ export default function AdminPage() {
   };
 
   const fetchData = async () => {
+    if (!supabase) return;
     try {
       // Fetch admin stats
       const { data: statsData } = await supabase.rpc('get_admin_stats');
@@ -299,6 +301,7 @@ export default function AdminPage() {
   };
 
   const handleUserAction = async (userId: string, action: string) => {
+    if (!supabase) return;
     try {
       switch (action) {
         case 'verify':
@@ -327,6 +330,7 @@ export default function AdminPage() {
   };
 
   const handleMaintenanceToggle = async () => {
+    if (!supabase) return;
     try {
       const newValue = !maintenanceMode;
       await supabase
