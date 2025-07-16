@@ -52,12 +52,6 @@
       "namedRegex": "^/dashboard/history(?:/)?$"
     },
     {
-      "page": "/dashboard/wallet",
-      "regex": "^/dashboard/wallet(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/dashboard/wallet(?:/)?$"
-    },
-    {
       "page": "/forgot-password",
       "regex": "^/forgot\\-password(?:/)?$",
       "routeKeys": {},
