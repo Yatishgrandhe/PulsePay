@@ -4,9 +4,10 @@ import { Box, Typography, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import { 
   PersonAdd, 
-  Payment, 
+  Psychology, 
   Verified,
-  Analytics as AnalyticsIcon
+  Analytics as AnalyticsIcon,
+  HealthAndSafety
 } from '@mui/icons-material';
 
 interface Step {
@@ -20,31 +21,31 @@ interface Step {
 const steps: Step[] = [
   {
     icon: <PersonAdd sx={{ fontSize: 48 }} />,
-    title: "Register & Authenticate",
-    description: "Sign up in seconds with email, biometrics, or WalletConnect. Your identity is verified instantly using AI and blockchain technology.",
+    title: "Register & Connect",
+    description: "Sign up in seconds with email or biometrics. Connect your health devices and sync your medical history for personalized AI analysis.",
     step: 1,
-    color: "#7B61FF"
+    color: "#1E3A8A"
   },
   {
-    icon: <Payment sx={{ fontSize: 48 }} />,
-    title: "Emergency Payment",
-    description: "Enter the recipient and amount. PulsePay handles the rest—secure, instant, and verifiable payments processed in under 0.3 seconds.",
+    icon: <Psychology sx={{ fontSize: 48 }} />,
+    title: "AI Health Assessment",
+    description: "Our advanced AI analyzes your symptoms, vital signs, and health data to provide accurate diagnostics and personalized recommendations.",
     step: 2,
-    color: "#E573B7"
+    color: "#3B82F6"
   },
   {
-    icon: <Verified sx={{ fontSize: 48 }} />,
-    title: "Track & Confirm",
-    description: "Get real-time updates, receipts, and blockchain confirmations. Export your payment history anytime for compliance and transparency.",
+    icon: <HealthAndSafety sx={{ fontSize: 48 }} />,
+    title: "Get Health Insights",
+    description: "Receive detailed health reports, treatment recommendations, and preventive care suggestions based on AI-powered analysis.",
     step: 3,
     color: "#10B981"
   },
   {
     icon: <AnalyticsIcon sx={{ fontSize: 48 }} />,
-    title: "Monitor & Analyze",
-    description: "Access detailed analytics, fraud detection reports, and performance metrics. Monitor your payment ecosystem in real-time.",
+    title: "Monitor & Improve",
+    description: "Track your health progress, view trends, and get predictive insights. Continuous monitoring helps you achieve better health outcomes.",
     step: 4,
-    color: "#FFD166"
+    color: "#9CA3AF"
   }
 ];
 
@@ -64,14 +65,14 @@ export default function HowItWorksSection() {
             fontWeight={700} 
             sx={{ mb: 2, color: 'text.primary' }}
           >
-            How PulsePay Works
+            How Health AI Works
           </Typography>
           <Typography 
             variant="h6" 
             textAlign="center" 
             sx={{ mb: 8, color: 'text.secondary', maxWidth: 600, mx: 'auto' }}
           >
-            Four simple steps to revolutionize emergency payments
+            Four simple steps to revolutionize your health with AI
           </Typography>
         </motion.div>
 
@@ -181,7 +182,7 @@ export default function HowItWorksSection() {
           position: 'relative',
           mt: 4,
           height: 2,
-          background: 'linear-gradient(90deg, #7B61FF, #E573B7, #10B981, #FFD166)',
+          background: 'linear-gradient(90deg, #1E3A8A, #3B82F6, #10B981, #9CA3AF)',
           borderRadius: 1,
           opacity: 0.3
         }} />

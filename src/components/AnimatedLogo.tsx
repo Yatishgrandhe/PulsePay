@@ -1,262 +1,263 @@
 "use client";
 
-import Image from 'next/image';
-import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
-import { Box, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { motion } from "framer-motion";
+import { Box } from "@mui/material";
 
 interface AnimatedLogoProps {
   size?: number;
-  showText?: boolean;
-  variant?: "default" | "hero" | "compact" | "floating" | "bounce" | "spin";
-  interactive?: boolean;
-  className?: string;
-  theme?: "primary" | "modern" | "vibrant" | "elegant";
+  variant?: "default" | "compact" | "hero";
   showWhiteCircle?: boolean;
 }
 
 export default function AnimatedLogo({ 
-  size = 120, 
-  showText = false,
+  size = 80, 
   variant = "default",
-  interactive = true,
-  className = "",
-  theme = "modern",
-  showWhiteCircle = false
+  showWhiteCircle = true 
 }: AnimatedLogoProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const controls = useAnimation();
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  
-  // Subtle 3D effect - reduced for better performance
-  const rotateX = useTransform(mouseY, [-size/2, size/2], [5, -5]);
-  const rotateY = useTransform(mouseX, [-size/2, size/2], [-5, 5]);
-
-  // Enhanced color schemes with better contrast
-  const themes = {
-    primary: {
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      glow: '#667eea',
-    },
-    modern: {
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-      glow: '#667eea',
-    },
-    vibrant: {
-      gradient: 'linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%)',
-      glow: '#ff6b6b',
-    },
-    elegant: {
-      gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-      glow: '#a8edea',
-    }
-  };
-
-  const currentTheme = themes[theme];
-
-  // Optimized animation variants
-  const logoVariants = {
-    default: {
-      scale: 1,
-      rotate: 0,
-      y: 0,
-      transition: {
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 30
-      }
-    },
-    hero: {
-      scale: [1, 1.05, 1],
-      y: [0, -3, 0],
+  const pulseAnimation = {
+    scale: [1, 1.1, 1],
       transition: {
         duration: 2,
         repeat: Infinity,
         ease: "easeInOut" as const
       }
-    },
-    floating: {
-      y: [0, -8, 0],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut" as const
-      }
-    },
-    bounce: {
-      y: [0, -15, 0],
-      scale: [1, 1.05, 1],
-      transition: {
-        duration: 1.2,
-        repeat: Infinity,
-        ease: "easeInOut" as const
-      }
-    },
-    spin: {
-      rotate: [0, 360],
-      transition: {
-        duration: 8,
-        repeat: Infinity,
-        ease: "linear" as const
-      }
-    }
   };
 
-  const handleMouseMove = (event: React.MouseEvent) => {
-    if (!interactive) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    mouseX.set(event.clientX - centerX);
-    mouseY.set(event.clientY - centerY);
+  const logoColors = {
+    blue: "#1E3A8A",
+    lightBlue: "#3B82F6",
+    silver: "#9CA3AF",
+    darkSilver: "#6B7280"
   };
 
-  const handleMouseLeave = () => {
-    if (!interactive) return;
-    mouseX.set(0);
-    mouseY.set(0);
-    setIsHovered(false);
-  };
-
-  const handleMouseEnter = () => {
-    if (!interactive) return;
-    setIsHovered(true);
-  };
-
-  useEffect(() => {
-    if (isHovered && interactive) {
-      controls.start({
-        scale: 1.08,
-        transition: { 
-          type: "spring" as const,
-          stiffness: 400,
-          damping: 25
-        }
-      });
-    } else {
-      controls.start({
-        scale: 1,
-        transition: { 
-          type: "spring" as const,
-          stiffness: 400,
-          damping: 25
-        }
-      });
-    }
-  }, [isHovered, interactive, controls]);
-
-  return (
-    <Box 
-      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        gap: 2,
-        position: 'relative',
-        cursor: interactive ? 'pointer' : 'default'
-      }}
-      className={className}
-    >
+  if (variant === "compact") {
+    return (
       <motion.div
-        className="relative flex items-center justify-center"
-        style={{
-          width: size + 60,
-          height: size + 60,
-          transformStyle: 'preserve-3d',
-          rotateX: interactive ? rotateX : 0,
-          rotateY: interactive ? rotateY : 0,
-        }}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        animate={controls}
+        animate={pulseAnimation}
+        style={{ display: "inline-block" }}
       >
-        {/* White circle background if requested */}
-        {showWhiteCircle && (
-          <motion.div
-            className="absolute rounded-full"
-            style={{
-              background: 'white',
-              width: size + 16,
-              height: size + 16,
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 2,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            }}
-            animate={{
-              scale: isHovered ? 1.05 : 1,
-              boxShadow: isHovered
-                ? '0 8px 30px rgba(0,0,0,0.15)'
-                : '0 4px 20px rgba(0,0,0,0.08)',
-            }}
-            transition={{ duration: 0.3 }}
-          />
-        )}
-        
-        {/* Logo image - positioned exactly where the shapes were */}
-        <motion.div
-          className="relative z-20"
-          style={{
+        <Box
+          sx={{
             width: size,
             height: size,
-            borderRadius: '50%',
-            overflow: 'hidden',
-            background: 'transparent',
-            boxShadow: isHovered 
-              ? `0 0 30px ${currentTheme.glow}60, 0 8px 25px rgba(0, 0, 0, 0.15)`
-              : `0 0 20px ${currentTheme.glow}40, 0 4px 15px rgba(0, 0, 0, 0.1)`,
-            transition: 'box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
           }}
-          variants={logoVariants}
-          animate={variant === "default" ? "default" : variant}
         >
-          <Image
-            src="/image.png"
-            alt="PulsePay logo: heart with dollar and pulse line"
-            width={size}
-            height={size}
-            priority
-            className="w-full h-full object-contain"
-            style={{ 
-              borderRadius: '50%',
-              background: 'transparent',
+          {/* Medical Cross */}
+          <Box
+            sx={{
+              width: size * 0.8,
+              height: size * 0.8,
+              position: "relative",
+              "&::before, &::after": {
+                content: '""',
+                position: "absolute",
+                background: logoColors.blue,
+                borderRadius: "4px"
+              },
+              "&::before": {
+                width: size * 0.2,
+                height: size * 0.8,
+                left: "50%",
+                top: 0,
+                transform: "translateX(-50%)"
+              },
+              "&::after": {
+                width: size * 0.8,
+                height: size * 0.2,
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)"
+              }
             }}
           />
-        </motion.div>
-      </motion.div>
-      
-      {/* Enhanced text with theme support */}
-      {showText && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ 
-            delay: 0.3, 
-            duration: 0.6,
-            ease: "easeOut" as const
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            fontWeight={700}
+          
+          {/* AI Chip overlay */}
+          <Box
             sx={{
-              background: currentTheme.gradient,
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textAlign: 'center',
-              filter: isHovered ? `drop-shadow(0 0 8px ${currentTheme.glow}40)` : 'none',
-              transition: 'filter 0.3s ease',
-              userSelect: 'none',
+              position: "absolute",
+              right: size * 0.1,
+              top: size * 0.1,
+              width: size * 0.3,
+              height: size * 0.3,
+              background: logoColors.silver,
+              borderRadius: "4px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: size * 0.15,
+              fontWeight: "bold",
+              color: logoColors.blue,
+              border: `2px solid ${logoColors.blue}`
             }}
           >
-            PulsePay
-          </Typography>
+            AI
+          </Box>
+        </Box>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      animate={pulseAnimation}
+      style={{ display: "inline-block" }}
+    >
+    <Box 
+      sx={{ 
+          width: size,
+          height: size,
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        {/* Background circle */}
+        {showWhiteCircle && (
+          <Box
+            sx={{
+              width: size,
+              height: size,
+              borderRadius: "50%",
+              background: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(10px)",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
+              position: "absolute"
+            }}
+          />
+        )}
+
+        {/* Medical Cross */}
+        <Box
+          sx={{
+            width: size * 0.7,
+            height: size * 0.7,
+            position: "relative",
+            zIndex: 1,
+            "&::before, &::after": {
+              content: '""',
+              position: "absolute",
+              background: logoColors.blue,
+              borderRadius: "4px"
+            },
+            "&::before": {
+              width: size * 0.15,
+              height: size * 0.7,
+              left: "50%",
+              top: 0,
+              transform: "translateX(-50%)"
+            },
+            "&::after": {
+              width: size * 0.7,
+              height: size * 0.15,
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)"
+            }
+          }}
+        />
+
+        {/* Caduceus Symbol */}
+        <Box
+          sx={{
+            position: "absolute",
+            width: size * 0.4,
+            height: size * 0.6,
+            zIndex: 2,
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              width: size * 0.02,
+              height: size * 0.5,
+              background: logoColors.blue,
+              left: "50%",
+              top: size * 0.05,
+              transform: "translateX(-50%)"
+            },
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              width: size * 0.15,
+              height: size * 0.15,
+              background: logoColors.blue,
+              borderRadius: "50%",
+              left: "50%",
+              top: 0,
+              transform: "translateX(-50%)"
+            }
+          }}
+          />
+        
+        {/* AI Chip */}
+        <Box
+          sx={{
+            position: "absolute",
+            right: size * 0.05,
+            top: size * 0.05,
+            width: size * 0.25,
+            height: size * 0.25,
+            background: logoColors.silver,
+            borderRadius: "4px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: size * 0.12,
+            fontWeight: "bold",
+            color: logoColors.blue,
+            border: `2px solid ${logoColors.blue}`,
+            zIndex: 3
+          }}
+        >
+          AI
+        </Box>
+        
+        {/* Pulse rings */}
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0, 0.2]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0
+          }}
+          style={{
+            position: "absolute",
+            width: size,
+            height: size,
+            border: `2px solid ${logoColors.lightBlue}`,
+            borderRadius: "50%",
+            pointerEvents: "none"
+            }}
+          />
+        
+        <motion.div
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.1, 0, 0.1]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5
+          }}
+          style={{
+            position: "absolute",
+            width: size,
+            height: size,
+            border: `1px solid ${logoColors.blue}`,
+            borderRadius: "50%",
+            pointerEvents: "none"
+          }}
+        />
+      </Box>
         </motion.div>
-      )}
-    </Box>
   );
 }

@@ -8,21 +8,21 @@ import { ReactNode } from "react";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#7B61FF",
-      light: "#9B81FF",
-      dark: "#5B41DF",
+      main: "#1E3A8A",
+      light: "#3B82F6",
+      dark: "#1E40AF",
     },
     secondary: {
-      main: "#E573B7",
-      light: "#FF93D7",
-      dark: "#C55397",
+      main: "#9CA3AF",
+      light: "#D1D5DB",
+      dark: "#6B7280",
     },
     background: {
       default: "#FAFBFC",
       paper: "#FFFFFF",
     },
     text: {
-      primary: "#232946",
+      primary: "#111827",
       secondary: "#6B7280",
     },
   },
@@ -72,9 +72,9 @@ const theme = createTheme({
           padding: "12px 32px",
         },
         contained: {
-          boxShadow: "0 4px 20px rgba(123, 97, 255, 0.3)",
+          boxShadow: "0 4px 20px rgba(30, 58, 138, 0.3)",
           "&:hover": {
-            boxShadow: "0 6px 25px rgba(123, 97, 255, 0.4)",
+            boxShadow: "0 6px 25px rgba(30, 58, 138, 0.4)",
           },
         },
       },

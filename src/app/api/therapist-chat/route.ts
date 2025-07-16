@@ -1,103 +1,226 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/utils/supabaseClient';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "ai";
-  timestamp: Date;
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+interface ChatRequest {
+  message: string;
+  sessionId: string;
+  userId?: string;
+  localMessages?: ChatMessage[];
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, conversationHistory } = await request.json();
+    const body: ChatRequest = await request.json();
+    const { message, sessionId, localMessages } = body;
 
-    // Friendly conversation prompt
-    const enhancedPrompt = `You are a caring, supportive friend who's here to listen and chat. You're warm, friendly, and genuinely want to help people feel better.
+    // Get user from auth header if available
+    let user = null;
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
+      if (!authError && authUser) {
+        user = authUser;
+      }
+    }
 
-The user has shared: "${message}"
+    // If user is logged in and has local messages, transfer them to database
+    if (user && localMessages && localMessages.length > 0) {
+      await transferLocalMessagesToDatabase(user.id, sessionId, localMessages);
+    }
 
-Please respond like a good friend would:
+    // Get chat history from database if user is logged in
+    let chatHistory: ChatMessage[] = [];
+    if (user) {
+      const { data: dbMessages } = await supabase
+        .from('chat_sessions')
+        .select('messages')
+        .eq('user_id', user.id)
+        .eq('session_id', sessionId)
+        .single();
 
-1. **Be Supportive**: 
-   - If they're feeling down: Be positive, hopeful, and encouraging
-   - If they're anxious: Be calm and reassuring
-   - If they're angry: Be understanding and help them feel heard
-   - If they're happy: Celebrate with them!
+      if (dbMessages?.messages) {
+        chatHistory = dbMessages.messages;
+      }
+    }
 
-2. **Listen & Validate**: Show you understand how they're feeling and that it's okay to feel that way.
+    // Prepare conversation for AI
+    const conversation = [
+      {
+        role: 'system' as const,
+        content: `You are Dr. Sarah Chen, a licensed clinical psychologist with 15+ years of experience specializing in cognitive behavioral therapy and mindfulness-based interventions. You provide warm, empathetic, and evidence-based support.
 
-3. **Offer Gentle Help**: Give one simple, friendly suggestion that might help them feel better.
+Key Guidelines:
+- Keep responses concise and clear (2-3 sentences max)
+- Be encouraging and positive, especially when the user expresses negative emotions
+- Use a warm, professional tone
+- Offer practical, actionable advice when appropriate
+- Maintain appropriate therapeutic boundaries
+- If someone is in crisis, encourage them to contact emergency services
 
-4. **Keep It Casual**: Use everyday language - no fancy talk, just being a good friend.
+Remember: You're here to support and guide, not replace professional mental health care.`
+      },
+      ...chatHistory.map(msg => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content
+      })),
+      {
+        role: 'user' as const,
+        content: message
+      }
+    ];
 
-Keep your response short and sweet (1-2 sentences max). Be encouraging and positive, especially when they're having a tough time. Help them see the good things and possibilities.`;
-
-    // Prepare conversation context (last 5 messages for continuity)
-    const recentMessages = conversationHistory.slice(-5);
-    
-    // Use OpenRouter API for enhanced responses with internet research
-    const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // Call OpenRouter API
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': request.headers.get('origin') || 'https://pulsepay.vercel.app',
-        'X-Title': 'PulsePay AI Therapist'
+        'HTTP-Referer': 'https://health-ai.com',
+        'X-Title': 'Health AI Therapist Chat'
       },
       body: JSON.stringify({
         model: 'anthropic/claude-3.5-sonnet',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a caring, supportive friend who\'s here to listen and chat. You\'re warm, friendly, and genuinely want to help people feel better. Keep responses short and sweet (1-2 sentences max). Use casual, everyday language - no fancy talk, just being a good friend. Be encouraging and positive, especially when they\'re having a tough time. Help them see the good things and possibilities.'
-          },
-          ...recentMessages.map((msg: Message) => ({
-            role: msg.sender === 'user' ? 'user' : 'assistant',
-            content: msg.text
-          })),
-          {
-            role: 'user',
-            content: enhancedPrompt
-          }
-        ],
-        max_tokens: 600,
-        temperature: 0.7,
-        stream: false
+        messages: conversation,
+        max_tokens: 150,
+        temperature: 0.7
       })
     });
 
-    if (!openRouterResponse.ok) {
-      throw new Error(`OpenRouter API error: ${openRouterResponse.status}`);
+    if (!response.ok) {
+      throw new Error('Failed to get AI response');
     }
 
-    const data = await openRouterResponse.json();
-    const aiResponse = data.choices[0]?.message?.content || '';
+    const data = await response.json();
+    const aiResponse = data.choices[0]?.message?.content || 'I apologize, but I\'m having trouble responding right now. Please try again in a moment.';
 
-    // Fallback response if API fails
-    if (!aiResponse) {
-      return NextResponse.json({
-        response: `Hey, I totally get how you're feeling right now. It's totally okay to feel this way, and I'm here to listen and chat with you.
+    // Create response message
+    const responseMessage: ChatMessage = {
+      role: 'assistant',
+      content: aiResponse,
+      timestamp: new Date().toISOString()
+    };
 
-You know what? Sometimes just talking to someone who cares can make a huge difference. Maybe try reaching out to a friend or family member who you trust, or do something that makes you smile - like watching a funny video or going for a walk.
+    // Store in database if user is logged in
+    if (user) {
+      const updatedMessages = [...chatHistory, 
+        { role: 'user', content: message, timestamp: new Date().toISOString() },
+        responseMessage
+      ];
 
-Remember, tough times don't last forever, and you're stronger than you think! What's been on your mind lately? I'm here to chat whenever you need a friend.`
-      });
+      await supabase
+        .from('chat_sessions')
+        .upsert({
+          user_id: user.id,
+          session_id: sessionId,
+          messages: updatedMessages,
+          last_updated: new Date().toISOString()
+        });
     }
 
     return NextResponse.json({
-      response: aiResponse
+      response: aiResponse,
+      sessionId,
+      userId: user?.id || null
     });
 
   } catch (error) {
-    console.error('Therapist chat API error:', error);
+    console.error('Therapist chat error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to process message',
+      response: 'I apologize, but I\'m having trouble responding right now. Please try again in a moment.'
+    }, { status: 500 });
+  }
+}
+
+async function transferLocalMessagesToDatabase(userId: string, sessionId: string, localMessages: ChatMessage[]) {
+  try {
+    // Check if session already exists
+    const { data: existingSession } = await supabase
+      .from('chat_sessions')
+      .select('messages')
+      .eq('user_id', userId)
+      .eq('session_id', sessionId)
+      .single();
+
+    if (existingSession) {
+      // Merge local messages with existing ones, avoiding duplicates
+      const existingMessages = existingSession.messages || [];
+      const mergedMessages = [...existingMessages];
+      
+      localMessages.forEach(localMsg => {
+        const exists = existingMessages.some((existing: ChatMessage) => 
+          existing.content === localMsg.content && 
+          existing.timestamp === localMsg.timestamp
+        );
+        if (!exists) {
+          mergedMessages.push(localMsg);
+        }
+      });
+
+      await supabase
+        .from('chat_sessions')
+        .update({
+          messages: mergedMessages,
+          last_updated: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .eq('session_id', sessionId);
+    } else {
+      // Create new session with local messages
+      await supabase
+        .from('chat_sessions')
+        .insert({
+          user_id: userId,
+          session_id: sessionId,
+          messages: localMessages,
+          last_updated: new Date().toISOString()
+        });
+    }
+  } catch (error) {
+    console.error('Error transferring local messages:', error);
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const sessionId = searchParams.get('sessionId');
+    const authHeader = request.headers.get('authorization');
+
+    if (!authHeader || !sessionId) {
+      return NextResponse.json({ error: 'Missing authentication or session ID' }, { status: 400 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
-    // Fallback response for any errors
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Get chat history
+    const { data: chatSession } = await supabase
+      .from('chat_sessions')
+      .select('messages, created_at, last_updated')
+      .eq('user_id', user.id)
+      .eq('session_id', sessionId)
+      .single();
+
     return NextResponse.json({
-      response: `Oops! I'm having a little trouble connecting right now, but don't worry - I'm still here for you!
-
-You know what always helps me feel better? Talking to someone who cares, doing something fun, or just taking a few deep breaths. Maybe try calling a friend or doing something that makes you smile?
-
-I'll be back to chat soon! Remember, you're awesome and you've got this. Brighter days are definitely ahead! 🌟`
+      messages: chatSession?.messages || [],
+      createdAt: chatSession?.created_at,
+      lastUpdated: chatSession?.last_updated
     });
+
+  } catch (error) {
+    console.error('Get chat history error:', error);
+    return NextResponse.json({ error: 'Failed to get chat history' }, { status: 500 });
   }
 } 

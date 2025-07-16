@@ -5,7 +5,7 @@ import { Box, Container, Typography, Button, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import AnimatedLogo from "@/components/AnimatedLogo";
+import Logo from "@/components/Logo";
 import FeaturesSection from "@/components/FeaturesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
@@ -20,7 +20,7 @@ const HeroBox = styled(Box)({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+  background: "linear-gradient(135deg, #1E3A8A 0%, #3B82F6 50%, #9CA3AF 100%)",
   position: "relative",
   overflow: "hidden",
   paddingTop: "80px",
@@ -42,17 +42,17 @@ const HeroBox = styled(Box)({
     left: 0,
     right: 0,
     bottom: 0,
-    background: "radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(240, 147, 251, 0.4) 0%, transparent 50%)",
+    background: "radial-gradient(circle at 20% 80%, rgba(30, 58, 138, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.4) 0%, transparent 50%)",
     pointerEvents: "none",
   }
 });
 
 const AnimatedText = [
-  "Instant, AI-powered emergency payments for health crises.",
-  "Blockchain-secure. Verifiable. Trusted by thousands.",
-  "Built for hackathons. Ready for investors.",
-  "24/7 support. Global reach. Zero downtime.",
-  "PulsePay: The future of emergency health payments."
+  "Advanced AI-powered health diagnostics and personalized care.",
+  "Intelligent medical insights. Trusted by healthcare professionals.",
+  "Built with cutting-edge AI. Ready for the future of healthcare.",
+  "24/7 AI support. Global reach. Zero downtime.",
+  "Health AI: The future of intelligent healthcare."
 ];
 
 export default function Home() {
@@ -104,10 +104,10 @@ export default function Home() {
                   mb: 4,
                   position: 'relative',
                 }}>
-                  <AnimatedLogo 
+                  <Logo 
                     size={160} 
                     variant="hero" 
-                    showWhiteCircle={false}
+                    showText={false}
                   />
                 </Box>
               </motion.div>
@@ -127,7 +127,7 @@ export default function Home() {
                     fontSize: { xs: "2.5rem", md: "3.5rem" }
                   }}
                 >
-                  PulsePay
+                  Health AI
                 </Typography>
               </motion.div>
 
@@ -180,18 +180,18 @@ export default function Home() {
                     sx={{ 
                       borderRadius: 50, 
                       fontWeight: 700, 
-                      background: "linear-gradient(45deg, #FF6B6B, #4ECDC4)",
+                      background: "linear-gradient(45deg, #1E3A8A, #3B82F6)",
                       color: "white",
                       px: 6,
                       py: 2,
                       fontSize: "1.1rem",
-                      boxShadow: "0 8px 32px rgba(255,107,107,0.4)",
+                      boxShadow: "0 8px 32px rgba(30,58,138,0.4)",
                       position: 'relative',
                       zIndex: 10,
                       cursor: 'pointer',
                       "&:hover": {
-                        background: "linear-gradient(45deg, #FF5252, #26A69A)",
-                        boxShadow: "0 12px 40px rgba(255,107,107,0.6)",
+                        background: "linear-gradient(45deg, #1E40AF, #2563EB)",
+                        boxShadow: "0 12px 40px rgba(30,58,138,0.6)",
                         transform: "translateY(-2px)",
                       },
                       "&:active": {

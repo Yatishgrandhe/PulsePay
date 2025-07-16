@@ -6,8 +6,8 @@ import { HeartPulse, Bot, Wallet, Shield, Rocket } from 'lucide-react';
 
 const slides = [
   {
-    title: 'AI-Powered Emergency Payments',
-    description: 'Send and receive instant, secure payments during health crises. No delays, no paperwork.',
+      title: 'AI-Powered Health Diagnostics',
+  description: 'Advanced AI diagnostics and personalized health insights. Instant analysis, comprehensive care.',
     icon: <HeartPulse className="text-pulsepay-pink" size={48} aria-label="AI-Powered" />,
     bg: 'from-pulsepay-pink to-pulsepay-purple',
   },

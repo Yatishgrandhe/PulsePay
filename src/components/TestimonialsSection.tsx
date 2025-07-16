@@ -15,34 +15,34 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     name: "Dr. Sarah Chen",
-    role: "Emergency Physician",
+    role: "Cardiologist",
     company: "City General Hospital",
     avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face",
-    text: "PulsePay has revolutionized how we handle emergency payments. The speed and security are unmatched. It&rsquo;s literally saved lives in our ER.",
+    text: "Health AI has transformed our diagnostic capabilities. The AI-powered analysis is incredibly accurate and helps us catch conditions we might miss.",
     rating: 5
   },
   {
     name: "Marcus Rodriguez",
-    role: "Financial Director",
+    role: "Health Tech Director",
     company: "Global Health Network",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    text: "The AI verification system is incredible. We've reduced fraud by 99% while processing payments 10x faster than traditional methods.",
+    text: "The AI health assistant is revolutionary. It provides personalized care recommendations and helps patients manage their health proactively.",
     rating: 5
   },
   {
     name: "Dr. Emily Watson",
-    role: "Chief Medical Officer",
+    role: "Family Physician",
     company: "Rural Health Initiative",
     avatar: "https://images.unsplash.com/photo-1594824475544-3d0c0b0c0b0b?w=150&h=150&fit=crop&crop=face",
-    text: "As a rural healthcare provider, PulsePay has been a game-changer. Our patients can now receive emergency funds instantly, even in remote areas.",
+    text: "As a rural healthcare provider, Health AI has been invaluable. The remote monitoring and AI diagnostics help us serve patients better.",
     rating: 5
   },
   {
     name: "James Thompson",
-    role: "Operations Manager",
-    company: "Emergency Response Team",
+    role: "Health Analytics Manager",
+    company: "Digital Health Solutions",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-    text: "The real-time tracking and blockchain verification give us complete confidence. We've never had a payment issue in 2+ years of use.",
+    text: "The health analytics and predictive insights are game-changing. We can now identify health trends and intervene before conditions worsen.",
     rating: 5
   }
 ];
@@ -54,7 +54,7 @@ function StarRating({ rating }: { rating: number }) {
         <Star 
           key={i} 
           sx={{ 
-            color: i < rating ? '#FFD166' : '#E5E7EB',
+            color: i < rating ? '#1E3A8A' : '#E5E7EB',
             fontSize: 20
           }} 
         />
@@ -86,7 +86,7 @@ export default function TestimonialsSection() {
             textAlign="center" 
             sx={{ mb: 8, color: 'text.secondary', maxWidth: 600, mx: 'auto' }}
           >
-            See what medical professionals and organizations are saying about PulsePay
+            See what medical professionals and organizations are saying about Health AI
           </Typography>
         </motion.div>
 

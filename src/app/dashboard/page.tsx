@@ -3,500 +3,463 @@
 import { useState, useEffect } from "react";
 import { 
   Box, 
-  Card, 
-  CardContent, 
+  Container, 
+  Paper, 
   Typography, 
-  Button, 
-  Avatar, 
+  Card,
+  CardContent,
+  Button,
+  Avatar,
   Chip,
-  LinearProgress,
+  Divider,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider,
+  CircularProgress,
   Alert,
-  IconButton
+  Grid
 } from "@mui/material";
-import {
-  AccountBalanceWallet as WalletIcon,
-  Payment as PaymentIcon,
-  TrendingUp as TrendingUpIcon,
-  Security as SecurityIcon,
+import { 
+  Psychology as PsychologyIcon,
   HealthAndSafety as HealthIcon,
-  Notifications as NotificationsIcon,
+  History as HistoryIcon,
+  Person as PersonIcon,
+  TrendingUp as TrendingUpIcon,
+  SmartToy as AIIcon,
+  Receipt as ReceiptIcon,
+  Add as AddIcon,
   ArrowForward as ArrowForwardIcon,
-  CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
-  Info as InfoIcon
+  Analytics as AnalyticsIcon
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/utils/supabaseClient";
+import AnimatedLogo from "@/components/AnimatedLogo";
 import Link from "next/link";
 
-interface Payment {
-  id: string;
-  amount: string;
-  status: string;
-  created_at: string;
-  description?: string;
-}
-
 interface DashboardStats {
-  totalPayments: number;
-  totalSpent: number;
-  walletBalance: number;
-  kycStatus: string;
-  fraudScore: number;
-  recentPayments: Payment[];
-  healthToolsUsed: number;
+  totalDiagnoses: number;
+  healthScore: number;
+  aiSessions: number;
+  recentActivities: any[];
 }
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalPayments: 0,
-    totalSpent: 0,
-    walletBalance: 0,
-    kycStatus: 'pending',
-    fraudScore: 0,
-    recentPayments: [],
-    healthToolsUsed: 0
-  });
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ user_metadata?: { full_name?: string } } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: any } | null>(null);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalDiagnoses: 0,
+    healthScore: 85,
+    aiSessions: 0,
+    recentActivities: []
+  });
+  const router = useRouter();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        
+        if (!user) {
+          router.push('/login');
+          return;
+        }
+
         setUser(user);
 
-        // Fetch user profile
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        // Fetch wallet data
-        const { data: wallet } = await supabase
-          .from('wallets')
+        // Fetch AI chat sessions
+        const { data: chatSessions } = await supabase
+          .from('chat_sessions')
           .select('*')
           .eq('user_id', user.id)
-          .eq('is_active', true)
-          .single();
-
-        // Fetch recent payments
-        const { data: payments } = await supabase
-          .from('payments')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        // Fetch payment stats
-        const { data: paymentStats } = await supabase
-          .from('payments')
-          .select('amount, status')
-          .eq('user_id', user.id);
+          .order('created_at', { ascending: false });
 
         // Fetch health tools usage
-        const { data: healthUsage } = await supabase
+        const { data: healthTools } = await supabase
           .from('health_tools_usage')
           .select('*')
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-        const totalPayments = paymentStats?.length || 0;
-        const totalSpent = paymentStats
-          ?.filter(p => p.status === 'completed')
-          ?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
+        if (chatSessions && healthTools) {
+          const totalDiagnoses = healthTools.filter(tool => tool.tool_type === 'diagnosis').length;
+          const recentActivities = [...chatSessions.slice(0, 3), ...healthTools.slice(0, 2)].sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          ).slice(0, 5);
 
-        setStats({
-          totalPayments,
-          totalSpent,
-          walletBalance: wallet?.balance || 0,
-          kycStatus: profile?.kyc_status || 'pending',
-          fraudScore: profile?.fraud_score || 0,
-          recentPayments: payments || [],
-          healthToolsUsed: healthUsage?.length || 0
-        });
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+          setStats({
+            totalDiagnoses,
+            healthScore: 85, // This could be calculated from various health metrics
+            aiSessions: chatSessions.length,
+            recentActivities
+          });
+        }
+      } catch (error: any) {
+        setError(error.message || 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [router]);
 
-  const getKycStatusColor = (status: string) => {
-    switch (status) {
-      case 'approved': return 'success';
-      case 'pending': return 'warning';
-      case 'rejected': return 'error';
-      default: return 'default';
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const quickActions = [
+    {
+      title: 'AI Health Assistant',
+      description: 'Chat with AI for health advice',
+      icon: <AIIcon />,
+      color: 'primary',
+      href: '/health-tools'
+    },
+    {
+      title: 'Health Analytics',
+      description: 'View your health insights',
+      icon: <AnalyticsIcon />,
+      color: 'secondary',
+      href: '/profile'
+    },
+    {
+      title: 'Profile Settings',
+      description: 'Manage your account',
+      icon: <PersonIcon />,
+      color: 'info',
+      href: '/profile'
+    },
+    {
+      title: 'Health Tools',
+      description: 'Access wellness features',
+      icon: <HealthIcon />,
+      color: 'success',
+      href: '/health-tools'
     }
-  };
-
-  const getFraudScoreColor = (score: number) => {
-    if (score <= 20) return 'success';
-    if (score <= 50) return 'warning';
-    return 'error';
-  };
-
-  const StatCard = ({ title, value, icon, color, subtitle, action }: { title: string; value: string | number; icon: React.ReactNode; color: string; subtitle?: string; action?: boolean }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Card sx={{ 
-        height: '100%',
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.2)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.15)'
-        }
-      }}>
-        <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Avatar sx={{ 
-              background: `linear-gradient(135deg, ${color}, ${color}dd)`,
-              width: 48,
-              height: 48
-            }}>
-              {icon}
-            </Avatar>
-            {action && (
-              <IconButton size="small" sx={{ color: 'primary.main' }}>
-                <ArrowForwardIcon />
-              </IconButton>
-            )}
-          </Box>
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#1a1a1a' }}>
-            {value}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-            {title}
-          </Typography>
-          {subtitle && (
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              {subtitle}
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
+  ];
 
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <LinearProgress sx={{ width: '100%', maxWidth: 400 }} />
+        <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box>
-      {/* Welcome Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" sx={{ 
-            fontWeight: 700, 
-            mb: 1,
-            background: "linear-gradient(90deg, #E573B7, #7B61FF)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent"
-          }}>
-            Welcome back, {user?.user_metadata?.full_name || 'User'}!
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Here&apos;s what&apos;s happening with your PulsePay account today.
-          </Typography>
-        </Box>
-      </motion.div>
-
-      {/* Status Alerts */}
-      {stats.kycStatus === 'pending' && (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)",
+        py: 4,
+        px: 2
+      }}
+    >
+      <Container maxWidth="lg">
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          <Alert 
-            severity="warning" 
-            icon={<InfoIcon />}
-            sx={{ mb: 3, borderRadius: 2 }}
-            action={
-              <Button color="inherit" size="small" component={Link} href="/dashboard/profile">
-                Complete KYC
-              </Button>
-            }
+          <Paper
+            elevation={24}
+            sx={{
+              p: { xs: 3, md: 4 },
+              borderRadius: 4,
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              position: "relative",
+              overflow: "hidden",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                background: "linear-gradient(90deg, #1E3A8A, #3B82F6, #9CA3AF)",
+                borderRadius: "4px 4px 0 0"
+              }
+            }}
           >
-            Please complete your KYC verification to unlock all features.
-          </Alert>
-        </motion.div>
-      )}
-
-      {/* Stats Grid */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
-        <StatCard
-          title="Total Payments"
-          value={stats.totalPayments}
-          icon={<PaymentIcon />}
-          color="#E573B7"
-          subtitle="All time"
-          action
-        />
-        <StatCard
-          title="Total Spent"
-          value={`$${stats.totalSpent.toFixed(2)}`}
-          icon={<TrendingUpIcon />}
-          color="#7B61FF"
-          subtitle="Completed payments"
-          action
-        />
-        <StatCard
-          title="Wallet Balance"
-          value={`$${stats.walletBalance.toFixed(2)}`}
-          icon={<WalletIcon />}
-          color="#FFD166"
-          subtitle="Available funds"
-          action
-        />
-        <StatCard
-          title="Health Tools Used"
-          value={stats.healthToolsUsed}
-          icon={<HealthIcon />}
-          color="#4CAF50"
-          subtitle="This month"
-          action
-        />
-      </Box>
-
-      {/* Security & Status Section */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3, mb: 4 }}>
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Card sx={{ 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-          }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <SecurityIcon sx={{ mr: 2, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Security Status
-                </Typography>
-              </Box>
-              
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="body2">KYC Status</Typography>
-                  <Chip 
-                    label={stats.kycStatus} 
-                    color={getKycStatusColor(stats.kycStatus) as 'success' | 'warning' | 'error' | 'default'}
-                    size="small"
-                  />
-                </Box>
-                <LinearProgress 
-                  variant="determinate" 
-                  value={stats.kycStatus === 'approved' ? 100 : 50}
-                  sx={{ height: 6, borderRadius: 3 }}
-                />
-              </Box>
-
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="body2">Fraud Risk Score</Typography>
-                  <Chip 
-                    label={`${stats.fraudScore}/100`} 
-                    color={getFraudScoreColor(stats.fraudScore) as 'success' | 'warning' | 'error'}
-                    size="small"
-                  />
-                </Box>
-                <LinearProgress 
-                  variant="determinate" 
-                  value={100 - stats.fraudScore}
-                  color={getFraudScoreColor(stats.fraudScore) as 'success' | 'warning' | 'error'}
-                  sx={{ height: 6, borderRadius: 3 }}
-                />
-              </Box>
-
-              <Button 
-                variant="outlined" 
-                fullWidth 
-                component={Link}
-                href="/dashboard/profile"
-                sx={{ mt: 2 }}
+            {/* Header */}
+            <Box sx={{ textAlign: "center", mb: 4 }}>
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
               >
-                View Security Settings
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
+                <Link href="/" passHref>
+                  <Box sx={{ cursor: "pointer", display: "inline-block" }}>
+                    <AnimatedLogo size={60} variant="compact" showWhiteCircle={false} />
+                  </Box>
+                </Link>
+              </motion.div>
+              <Typography
+                variant="h4"
+                component="h1"
+                sx={{
+                  fontWeight: 700,
+                  background: "linear-gradient(90deg, #1E3A8A, #3B82F6)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  mt: 2,
+                  mb: 1
+                }}
+              >
+                Welcome back, {user?.user_metadata?.full_name || 'User'}!
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Here's your health AI dashboard
+              </Typography>
+            </Box>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card sx={{ 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-          }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <NotificationsIcon sx={{ mr: 2, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Recent Activity
-                </Typography>
+            {/* Error Message */}
+            {error && (
+              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            {/* Stats Cards */}
+            <Box sx={{ mb: 4 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3 }}>
+                <Card sx={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <PsychologyIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
+                      {stats.totalDiagnoses}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      AI Diagnoses
+                    </Typography>
+                  </CardContent>
+                </Card>
+                <Card sx={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <TrendingUpIcon sx={{ fontSize: 40, color: 'success.main', mb: 1 }} />
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.main', mb: 1 }}>
+                      {stats.healthScore}%
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Health Score
+                    </Typography>
+                  </CardContent>
+                </Card>
+                <Card sx={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <AIIcon sx={{ fontSize: 40, color: 'info.main', mb: 1 }} />
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'info.main', mb: 1 }}>
+                      {stats.aiSessions}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      AI Sessions
+                    </Typography>
+                  </CardContent>
+                </Card>
+                <Card sx={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <HealthIcon sx={{ fontSize: 40, color: 'warning.main', mb: 1 }} />
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'warning.main', mb: 1 }}>
+                      24/7
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      AI Support
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Box>
-              
-              {stats.recentPayments.length > 0 ? (
-                <List sx={{ p: 0 }}>
-                  {stats.recentPayments.slice(0, 3).map((payment, index) => (
-                    <Box key={payment.id}>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Avatar sx={{ 
-                            width: 32, 
-                            height: 32,
-                            background: payment.status === 'completed' 
-                              ? 'linear-gradient(135deg, #4CAF50, #45a049)' 
-                              : 'linear-gradient(135deg, #FF9800, #F57C00)'
+            </Box>
+
+            {/* Quick Actions */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: 'primary.main' }}>
+                Quick Actions
+              </Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 2 }}>
+                {quickActions.map((action, index) => (
+                  <Box key={index}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    >
+                      <Card 
+                        sx={{ 
+                          background: 'rgba(255,255,255,0.9)', 
+                          backdropFilter: 'blur(20px)',
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s, box-shadow 0.2s',
+                          '&:hover': {
+                            transform: 'translateY(-4px)',
+                            boxShadow: 8
+                          }
+                        }}
+                        onClick={() => router.push(action.href)}
+                      >
+                        <CardContent sx={{ textAlign: 'center', p: 3 }}>
+                          <Box sx={{ 
+                            color: `${action.color}.main`, 
+                            mb: 2,
+                            display: 'flex',
+                            justifyContent: 'center'
                           }}>
-                            {payment.status === 'completed' ? <CheckCircleIcon /> : <WarningIcon />}
-                          </Avatar>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={`$${parseFloat(payment.amount).toFixed(2)}`}
-                          secondary={payment.description || 'Payment'}
-                          primaryTypographyProps={{ fontWeight: 600 }}
-                          secondaryTypographyProps={{ fontSize: '0.8rem' }}
-                        />
-                        <Chip 
-                          label={payment.status} 
-                          size="small"
-                          color={payment.status === 'completed' ? 'success' : 'warning'}
-                        />
-                      </ListItem>
-                      {index < Math.min(2, stats.recentPayments.length - 1) && (
-                        <Divider sx={{ my: 1 }} />
-                      )}
-                    </Box>
-                  ))}
-                </List>
+                            {action.icon}
+                          </Box>
+                          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                            {action.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            {action.description}
+                          </Typography>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            endIcon={<ArrowForwardIcon />}
+                            sx={{ borderRadius: 2 }}
+                          >
+                            Go
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+            <Divider sx={{ my: 4 }} />
+
+            {/* Recent Activities */}
+            <Box sx={{ mb: 4 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                  Recent Activities
+                </Typography>
+                <Button
+                  variant="text"
+                  onClick={() => router.push('/health-tools')}
+                  endIcon={<ArrowForwardIcon />}
+                  sx={{ borderRadius: 2 }}
+                >
+                  View All
+                </Button>
+              </Box>
+
+              {stats.recentActivities.length > 0 ? (
+                <Card sx={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                  <List>
+                    {stats.recentActivities.map((activity, index) => (
+                      <Box key={activity.id}>
+                        <ListItem>
+                          <ListItemIcon>
+                            <Avatar sx={{ 
+                              bgcolor: activity.session_type ? 'primary.main' : 'success.main',
+                              width: 40,
+                              height: 40
+                            }}>
+                              {activity.session_type ? <AIIcon /> : <HealthIcon />}
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                  {activity.session_type ? 'AI Chat Session' : 'Health Tool Used'}
+                                </Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                                  {activity.session_type ? 'AI Assistant' : activity.tool_type || 'Health Tool'}
+                                </Typography>
+                              </Box>
+                            }
+                            secondary={
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  {activity.session_type ? 'AI health consultation' : 'Health assessment completed'}
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                  <Chip 
+                                    label={activity.session_type ? 'AI Chat' : 'Health Tool'} 
+                                    color={activity.session_type ? 'primary' : 'success'}
+                                    size="small"
+                                  />
+                                  <Typography variant="caption" color="text.secondary">
+                                    {formatDate(activity.created_at)}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            }
+                          />
+                        </ListItem>
+                        {index < stats.recentActivities.length - 1 && <Divider />}
+                      </Box>
+                    ))}
+                  </List>
+                </Card>
               ) : (
-                <Box sx={{ textAlign: 'center', py: 3 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    No recent payments
-                  </Typography>
-                </Box>
+                <Card sx={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)' }}>
+                  <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                    <AIIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                      No activities yet
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                      Start using Health AI features to see your activities here
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      onClick={() => router.push('/health-tools')}
+                      sx={{
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #1E3A8A, #3B82F6)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #1E40AF, #2563EB)',
+                        }
+                      }}
+                    >
+                      Start AI Session
+                    </Button>
+                  </CardContent>
+                </Card>
               )}
+            </Box>
 
-              <Button 
-                variant="outlined" 
-                fullWidth 
-                component={Link}
-                href="/dashboard/history"
-                sx={{ mt: 2 }}
+            {/* Navigation */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => router.push('/profile')}
+                sx={{ borderRadius: 2 }}
               >
-                View All Payments
+                Profile Settings
               </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </Box>
-
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-      >
-        <Card sx={{ 
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.2)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-        }}>
-          <CardContent sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-              Quick Actions
-            </Typography>
-            
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 2 }}>
               <Button
                 variant="contained"
-                fullWidth
-                component={Link}
-                href="/pay"
+                onClick={() => router.push('/health-tools')}
                 sx={{
-                  py: 2,
-                  background: 'linear-gradient(135deg, #E573B7, #7B61FF)',
+                  borderRadius: 2,
+                  background: 'linear-gradient(135deg, #1E3A8A, #3B82F6)',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #D563A7, #6B51EF)',
+                    background: 'linear-gradient(135deg, #1E40AF, #2563EB)',
                   }
                 }}
               >
-                <PaymentIcon sx={{ mr: 1 }} />
-                Make Payment
-              </Button>
-              <Button
-                variant="outlined"
-                fullWidth
-                component={Link}
-                href="/dashboard/wallet"
-                sx={{ py: 2 }}
-              >
-                <WalletIcon sx={{ mr: 1 }} />
-                View Wallet
-              </Button>
-              <Button
-                variant="outlined"
-                fullWidth
-                component={Link}
-                href="/health-tools"
-                sx={{ py: 2 }}
-              >
-                <HealthIcon sx={{ mr: 1 }} />
-                Health Tools
-              </Button>
-              <Button
-                variant="outlined"
-                fullWidth
-                component={Link}
-                href="/dashboard/settings"
-                sx={{ py: 2 }}
-              >
-                <SecurityIcon sx={{ mr: 1 }} />
-                Settings
+                Start AI Session
               </Button>
             </Box>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </Paper>
+        </motion.div>
+      </Container>
     </Box>
   );
 } 

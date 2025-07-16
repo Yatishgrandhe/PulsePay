@@ -3,12 +3,14 @@
 import { Box, Typography, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import { 
-  Security, 
+  Psychology, 
   Speed, 
   Public, 
   VerifiedUser,
   Support,
-  Analytics
+  Analytics,
+  HealthAndSafety,
+  SmartToy
 } from '@mui/icons-material';
 
 interface FeatureItem {
@@ -20,40 +22,40 @@ interface FeatureItem {
 
 const features: FeatureItem[] = [
   {
-    icon: <Security sx={{ fontSize: 48 }} />,
-    title: "AI-Powered Verification",
-    description: "Real-time fraud detection and instant eligibility checks using advanced machine learning algorithms.",
-    color: "#7B61FF"
+    icon: <Psychology sx={{ fontSize: 48 }} />,
+    title: "AI-Powered Diagnostics",
+    description: "Advanced machine learning algorithms provide accurate health assessments and personalized recommendations.",
+    color: "#1E3A8A"
   },
   {
     icon: <Speed sx={{ fontSize: 48 }} />,
-    title: "Lightning Fast",
-    description: "Process emergency payments in under 0.3 seconds with our optimized blockchain infrastructure.",
-    color: "#E573B7"
+    title: "Instant Analysis",
+    description: "Get health insights and medical recommendations in seconds with our optimized AI infrastructure.",
+    color: "#3B82F6"
   },
   {
-    icon: <Public sx={{ fontSize: 48 }} />,
-    title: "Global Coverage",
-    description: "Send emergency payments to 45+ countries with real-time currency conversion and compliance.",
+    icon: <HealthAndSafety sx={{ fontSize: 48 }} />,
+    title: "Comprehensive Health Monitoring",
+    description: "Track vital signs, symptoms, and health trends with intelligent pattern recognition and alerts.",
     color: "#10B981"
   },
   {
     icon: <VerifiedUser sx={{ fontSize: 48 }} />,
-    title: "One-Click Authentication",
-    description: "Seamless login with biometrics, WalletConnect, or email with enterprise-grade security.",
-    color: "#FFD166"
+    title: "Secure Health Records",
+    description: "HIPAA-compliant data storage with biometric authentication and enterprise-grade security.",
+    color: "#9CA3AF"
   },
   {
-    icon: <Support sx={{ fontSize: 48 }} />,
-    title: "24/7 Support",
-    description: "Round-the-clock customer support with AI chatbots and human experts ready to help.",
-    color: "#3B82F6"
+    icon: <SmartToy sx={{ fontSize: 48 }} />,
+    title: "AI Health Assistant",
+    description: "24/7 intelligent health companion providing personalized advice and emergency guidance.",
+    color: "#6B7280"
   },
   {
     icon: <Analytics sx={{ fontSize: 48 }} />,
-    title: "Real-time Analytics",
-    description: "Track payments, view analytics, and export detailed reports for compliance and transparency.",
-    color: "#8B5CF6"
+    title: "Health Analytics",
+    description: "Comprehensive health reports, trend analysis, and predictive insights for better health outcomes.",
+    color: "#1E40AF"
   }
 ];
 
@@ -73,14 +75,14 @@ export default function FeaturesSection() {
             fontWeight={700} 
             sx={{ mb: 2, color: 'text.primary' }}
           >
-            Why Choose PulsePay?
+            Why Choose Health AI?
           </Typography>
           <Typography 
             variant="h6" 
             textAlign="center" 
             sx={{ mb: 6, color: 'text.secondary', maxWidth: 600, mx: 'auto' }}
           >
-            Built for emergency situations, designed for peace of mind
+            Built with cutting-edge AI, designed for better health outcomes
           </Typography>
         </motion.div>
 

@@ -1,13 +1,13 @@
 import { Line } from 'react-chartjs-2';
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
-import { Payment } from './PaymentHistory';
+import { HealthActivity } from './PaymentHistory';
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-function aggregatePayments(payments: Payment[]) {
+function aggregateHealthActivities(activities: HealthActivity[]) {
   const map: Record<string, number> = {};
-  payments.forEach(p => {
-    map[p.date] = (map[p.date] || 0) + p.amount;
+  activities.forEach(activity => {
+    map[activity.date] = (map[activity.date] || 0) + activity.duration;
   });
   const dates = Object.keys(map).sort();
   return {
@@ -16,17 +16,17 @@ function aggregatePayments(payments: Payment[]) {
   };
 }
 
-export default function PaymentChart({ payments }: { payments: Payment[] }) {
-  const { labels, data } = aggregatePayments(payments);
+export default function HealthActivityChart({ activities }: { activities: HealthActivity[] }) {
+  const { labels, data } = aggregateHealthActivities(activities);
   return (
     <div className="bg-white/90 dark:bg-pulsepay-blue/90 rounded-2xl shadow-lg p-6 mt-4">
-      <h3 className="font-heading font-bold text-lg text-pulsepay-purple mb-4">Payment Volume</h3>
+      <h3 className="font-heading font-bold text-lg text-pulsepay-purple mb-4">Health Activity Duration</h3>
       <Line
         data={{
           labels,
           datasets: [
             {
-              label: 'USDC Volume',
+              label: 'Duration (minutes)',
               data,
               fill: true,
               borderColor: '#7B61FF',

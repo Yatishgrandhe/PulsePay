@@ -41,7 +41,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/utils/supabaseClient";
-import AnimatedLogo from "@/components/AnimatedLogo";
+import Logo from "@/components/Logo";
 import Link from "next/link";
 
 const drawerWidth = 280;
@@ -62,10 +62,9 @@ const menuItems: MenuItem[] = [
   // Main Dashboard
   { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
   
-  // Payments & Wallet
-  { text: "Make Payment", icon: <PaymentIcon />, path: "/pay", category: "Payments" },
-  { text: "Wallet", icon: <WalletIcon />, path: "/dashboard/wallet" },
-  { text: "Payment History", icon: <HistoryIcon />, path: "/dashboard/history" },
+  // Health Services
+  { text: "Book Health Service", icon: <PaymentIcon />, path: "/pay", category: "Health Services" },
+  { text: "Health Activity History", icon: <HistoryIcon />, path: "/dashboard/history" },
   
   // Health & Wellness
   { text: "Health Tools", icon: <HealthIcon />, path: "/health-tools", category: "Health & Wellness" },
@@ -147,15 +146,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       }}>
         <Link href="/dashboard" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <AnimatedLogo size={40} variant="compact" showWhiteCircle={false} />
+            <Logo size={40} variant="compact" showText={false} />
             <Typography variant="h6" sx={{ 
               fontWeight: 700,
-              background: "linear-gradient(90deg, #E573B7, #7B61FF)",
+              background: "linear-gradient(90deg, #1E3A8A, #3B82F6)",
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent"
             }}>
-              PulsePay
+              Health AI
             </Typography>
           </Box>
         </Link>

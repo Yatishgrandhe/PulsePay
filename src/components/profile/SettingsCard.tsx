@@ -1,26 +1,26 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import * as Switch from "@radix-ui/react-switch";
-import { Payment } from "./PaymentHistory";
+import { HealthActivity } from "./PaymentHistory";
 
-function toCSV(payments: Payment[]): string {
-  const header = "Date,Amount,Status,Tx Hash";
-  const rows = payments.map(p => `${p.date},${p.amount},${p.status},${p.txHash}`);
+function toCSV(activities: HealthActivity[]): string {
+  const header = "Date,Service,Patient,Status,Duration";
+  const rows = activities.map(activity => `${activity.date},${activity.serviceName},${activity.patientName},${activity.status},${activity.duration}`);
   return [header, ...rows].join("\n");
 }
 
-function downloadCSV(payments: Payment[]) {
-  const csv = toCSV(payments);
+function downloadCSV(activities: HealthActivity[]) {
+  const csv = toCSV(activities);
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "pulsepay-payments.csv";
+  a.download = "health-ai-activities.csv";
   a.click();
   URL.revokeObjectURL(url);
 }
 
-export default function SettingsCard({ onSignOut, payments = [] }: { onSignOut: () => void; payments?: Payment[] }) {
+export default function SettingsCard({ onSignOut, activities = [] }: { onSignOut: () => void; activities?: HealthActivity[] }) {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -61,9 +61,9 @@ export default function SettingsCard({ onSignOut, payments = [] }: { onSignOut: 
         </Switch.Root>
       </div>
       <button
-        onClick={() => downloadCSV(payments)}
+        onClick={() => downloadCSV(activities)}
         className="px-6 py-2 rounded-full bg-gradient-to-r from-pulsepay-gold via-pulsepay-purple to-pulsepay-pink text-white font-bold shadow hover:scale-105 transition-transform duration-300"
-        disabled={!payments.length}
+        disabled={!activities.length}
       >
         Download CSV
       </button>

@@ -6,14 +6,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import AnimatedLogo from './AnimatedLogo';
+import Logo from './Logo';
 
 const navItems = [
   { name: 'Home', path: '/' },
   { name: 'How It Works', path: '/how-it-works' },
   { name: 'Health Tools', path: '/health-tools' },
   { name: 'Partner Hospitals', path: '/hospitals' },
-  { name: 'Partner Banks', path: '/banks' },
   { name: 'Login', path: '/login' },
   { name: 'Register', path: '/register' },
 ];
@@ -45,10 +44,10 @@ export default function Navigation() {
   const drawer = (
     <Box sx={{ width: 280, pt: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <AnimatedLogo 
+        <Logo 
           size={60} 
           variant="compact" 
-          showWhiteCircle={false}
+          showText={false}
         />
       </Box>
       <List>
@@ -62,7 +61,7 @@ export default function Navigation() {
               color: isActive(item.path) ? 'primary.main' : 'text.primary',
               fontWeight: isActive(item.path) ? 600 : 400,
               '&:hover': {
-                backgroundColor: 'rgba(123, 97, 255, 0.1)',
+                backgroundColor: 'rgba(30, 58, 138, 0.1)',
               }
             }}
           >
@@ -86,8 +85,8 @@ export default function Navigation() {
         position="fixed" 
         elevation={scrolled ? 8 : 0}
         sx={{
-          background: 'linear-gradient(90deg, #E573B7 0%, #7B61FF 100%)', // more prominent pink
-          minHeight: { xs: '80px', md: '100px' }, // bigger height
+          background: 'linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%)',
+          minHeight: { xs: '80px', md: '100px' },
           height: { xs: '80px', md: '100px' },
           justifyContent: 'flex-start',
           boxShadow: scrolled ? 8 : 0,
@@ -97,7 +96,7 @@ export default function Navigation() {
         <Toolbar sx={{ 
           justifyContent: 'space-between', 
           px: { xs: 3, md: 6 },
-          minHeight: { xs: '80px', md: '100px' }, // match AppBar
+          minHeight: { xs: '80px', md: '100px' },
           py: 0,
           maxWidth: '1400px',
           mx: 'auto',
@@ -112,34 +111,23 @@ export default function Navigation() {
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               <Box sx={{ 
                 display: 'flex', 
-                alignItems: 'center', // center vertically
+                alignItems: 'center',
                 gap: 2,
                 cursor: 'pointer',
-                // removed mt
-              }}>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', // center vertically
-                  justifyContent: 'center',
-                  width: { xs: 52, md: 60 },
-                  height: { xs: 52, md: 60 },
-                  position: 'relative',
                 }}>
-                  <AnimatedLogo 
+                <Logo 
                     size={40} 
                     variant="compact" 
-                    showWhiteCircle={false}
+                  showText={false}
                   />
-                </Box>
                 <Box sx={{ 
                   display: { xs: 'none', sm: 'block' },
                   color: 'white',
                   fontWeight: 700,
                   fontSize: { xs: '1.25rem', md: '1.5rem' },
                   letterSpacing: '-0.5px',
-                  // removed mt
                 }}>
-                  PulsePay
+                  Health AI
                 </Box>
               </Box>
             </Link>
@@ -176,7 +164,7 @@ export default function Navigation() {
                         left: '50%',
                         width: isActive(item.path) ? '100%' : '0%',
                         height: '3px',
-                        background: 'linear-gradient(90deg, #7B61FF, #E573B7)',
+                        background: 'linear-gradient(90deg, #1E3A8A, #3B82F6)',
                         transform: 'translateX(-50%)',
                         transition: 'width 0.3s ease',
                         borderRadius: '2px',
@@ -185,7 +173,7 @@ export default function Navigation() {
                         width: '100%',
                       },
                       '&:hover': {
-                        background: scrolled ? 'rgba(123, 97, 255, 0.15)' : 'rgba(255, 255, 255, 0.15)',
+                        background: scrolled ? 'rgba(30, 58, 138, 0.15)' : 'rgba(255, 255, 255, 0.15)',
                         transform: 'translateY(-2px)',
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                         color: scrolled ? 'primary.main' : 'white',
@@ -216,7 +204,7 @@ export default function Navigation() {
               p: 1.5,
               borderRadius: '50%',
               '&:hover': {
-                background: scrolled ? 'rgba(123, 97, 255, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+                background: scrolled ? 'rgba(30, 58, 138, 0.1)' : 'rgba(255, 255, 255, 0.1)',
                 transform: 'scale(1.05)',
               },
               transition: 'all 0.3s ease'
@@ -233,7 +221,7 @@ export default function Navigation() {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
+          keepMounted: true,
         }}
         sx={{
           display: { xs: 'block', md: 'none' },
@@ -252,9 +240,6 @@ export default function Navigation() {
         </Box>
         {drawer}
       </Drawer>
-
-      {/* Spacer to prevent content from hiding behind fixed navbar */}
-      <Toolbar />
     </>
   );
 } 

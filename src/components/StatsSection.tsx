@@ -6,10 +6,12 @@ import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
   Group, 
-  Security, 
+  Psychology, 
   FlashOn,
-  Public,
-  CheckCircle
+  HealthAndSafety,
+  CheckCircle,
+  SmartToy,
+  Analytics
 } from '@mui/icons-material';
 import { useInView } from 'react-intersection-observer';
 
@@ -23,46 +25,46 @@ interface StatItem {
 
 const stats: StatItem[] = [
   {
-    icon: <TrendingUp sx={{ fontSize: 40 }} />,
-    value: 2.5,
+    icon: <Psychology sx={{ fontSize: 40 }} />,
+    value: 1.2,
     suffix: "M+",
-    label: "Payments Processed",
-    color: "#7B61FF"
+    label: "AI Diagnoses Made",
+    color: "#1E3A8A"
   },
   {
     icon: <Group sx={{ fontSize: 40 }} />,
-    value: 150,
+    value: 250,
     suffix: "K+",
     label: "Active Users",
-    color: "#E573B7"
+    color: "#3B82F6"
   },
   {
-    icon: <Security sx={{ fontSize: 40 }} />,
-    value: 99.9,
+    icon: <HealthAndSafety sx={{ fontSize: 40 }} />,
+    value: 98.5,
     suffix: "%",
-    label: "Security Score",
+    label: "Diagnostic Accuracy",
     color: "#10B981"
   },
   {
     icon: <FlashOn sx={{ fontSize: 40 }} />,
-    value: 30,
+    value: 15,
     suffix: "s",
-    label: "Average Processing Time",
-    color: "#FFD166"
+    label: "Average Analysis Time",
+    color: "#9CA3AF"
   },
   {
-    icon: <Public sx={{ fontSize: 40 }} />,
-    value: 45,
+    icon: <SmartToy sx={{ fontSize: 40 }} />,
+    value: 50,
     suffix: "+",
-    label: "Countries Supported",
-    color: "#3B82F6"
+    label: "AI Health Features",
+    color: "#6B7280"
   },
   {
-    icon: <CheckCircle sx={{ fontSize: 40 }} />,
+    icon: <Analytics sx={{ fontSize: 40 }} />,
     value: 24,
     suffix: "/7",
-    label: "Support Availability",
-    color: "#8B5CF6"
+    label: "AI Support Available",
+    color: "#1E40AF"
   }
 ];
 
@@ -130,7 +132,7 @@ export default function StatsSection() {
             fontWeight={700} 
             sx={{ mb: 6, color: 'text.primary' }}
           >
-            PulsePay by the Numbers
+            Health AI by the Numbers
           </Typography>
         </motion.div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./pulsepay.css";
+import "./healthai.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PulsePay - Emergency Health Payments",
-  description: "AI-powered emergency payment platform for health crises. Instant, secure, and verifiable payments with blockchain, AI, and modern authentication.",
+  title: "Health AI - AI-Powered Health Solutions",
+  description: "Advanced AI-powered health platform with intelligent diagnostics, personalized care, and cutting-edge medical technology.",
 };
 
 export default function RootLayout({
@@ -26,15 +27,17 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#7B61FF" />
+        <meta name="theme-color" content="#1E3A8A" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/image.png" />
+        <link rel="apple-touch-icon" href="/image copy.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <AuthProvider>
         {children}
+        </AuthProvider>
       </body>
     </html>
   );
