@@ -1,6 +1,11 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "rm -rf .next && npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "buildCache": false
+  "buildCache": false,
+  "functions": {
+    "src/app/dashboard/wallet/page.tsx": {
+      "maxDuration": 0
+    }
+  }
 }

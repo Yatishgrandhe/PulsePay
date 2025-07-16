@@ -7,6 +7,13 @@
       "static/chunks/main-app-64b4edf26ba3bec0.js",
       "static/chunks/app/_not-found/page-36abebf639c9fb3d.js"
     ],
+    "/api/health-service/route": [
+      "static/chunks/webpack-5adebf9f62dc3001.js",
+      "static/chunks/c7879cf7-cedeef120974f7b7.js",
+      "static/chunks/870-42efb386c541c599.js",
+      "static/chunks/main-app-64b4edf26ba3bec0.js",
+      "static/chunks/app/api/health-service/route-dfaa5a3ff1b4474b.js"
+    ],
     "/api/payment/route": [
       "static/chunks/webpack-5adebf9f62dc3001.js",
       "static/chunks/c7879cf7-cedeef120974f7b7.js",
@@ -20,13 +27,6 @@
       "static/chunks/870-42efb386c541c599.js",
       "static/chunks/main-app-64b4edf26ba3bec0.js",
       "static/chunks/app/api/therapist-chat/route-062180a11dfd9b8f.js"
-    ],
-    "/api/health-service/route": [
-      "static/chunks/webpack-5adebf9f62dc3001.js",
-      "static/chunks/c7879cf7-cedeef120974f7b7.js",
-      "static/chunks/870-42efb386c541c599.js",
-      "static/chunks/main-app-64b4edf26ba3bec0.js",
-      "static/chunks/app/api/health-service/route-dfaa5a3ff1b4474b.js"
     ],
     "/auth/callback/route": [
       "static/chunks/webpack-5adebf9f62dc3001.js",
@@ -49,12 +49,12 @@
       "static/chunks/main-app-64b4edf26ba3bec0.js",
       "static/chunks/app/account-setup/page-b5c83a4e09441a13.js"
     ],
-    "/admin/page": [
+    "/login/page": [
       "static/chunks/webpack-5adebf9f62dc3001.js",
       "static/chunks/c7879cf7-cedeef120974f7b7.js",
       "static/chunks/870-42efb386c541c599.js",
       "static/chunks/main-app-64b4edf26ba3bec0.js",
-      "static/chunks/app/admin/page-46457b9b82bb226d.js"
+      "static/chunks/app/login/page-29476a969a687361.js"
     ],
     "/forgot-password/page": [
       "static/chunks/webpack-5adebf9f62dc3001.js",
@@ -62,13 +62,6 @@
       "static/chunks/870-42efb386c541c599.js",
       "static/chunks/main-app-64b4edf26ba3bec0.js",
       "static/chunks/app/forgot-password/page-eed2d66b4dccd9f8.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack-5adebf9f62dc3001.js",
-      "static/chunks/c7879cf7-cedeef120974f7b7.js",
-      "static/chunks/870-42efb386c541c599.js",
-      "static/chunks/main-app-64b4edf26ba3bec0.js",
-      "static/chunks/app/login/page-29476a969a687361.js"
     ],
     "/pay/page": [
       "static/chunks/webpack-5adebf9f62dc3001.js",
@@ -90,6 +83,13 @@
       "static/chunks/870-42efb386c541c599.js",
       "static/chunks/main-app-64b4edf26ba3bec0.js",
       "static/chunks/app/register/page-720b411ff0c6c11f.js"
+    ],
+    "/admin/page": [
+      "static/chunks/webpack-5adebf9f62dc3001.js",
+      "static/chunks/c7879cf7-cedeef120974f7b7.js",
+      "static/chunks/870-42efb386c541c599.js",
+      "static/chunks/main-app-64b4edf26ba3bec0.js",
+      "static/chunks/app/admin/page-46457b9b82bb226d.js"
     ],
     "/dashboard/layout": [
       "static/chunks/webpack-5adebf9f62dc3001.js",

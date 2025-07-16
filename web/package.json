@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "rm -rf .next && rm -rf src/app/dashboard/wallet && next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
     "node-fetch": "^3.3.2"
   }
